@@ -73,3 +73,11 @@ Route::prefix('v1/custom-sales-fields')
 Route::middleware(['auth:sanctum', 'feature:custom-sales-fields'])
     ->get('/v1/sales/{pid}/custom-fields', [CustomSalesFieldController::class, 'getSaleCustomFields'])
     ->where('pid', '[a-zA-Z0-9_-]+');
+
+// Override Pool Calculator (Grow Marketing)
+// Routes: /api/v2/override-pool/*
+Route::prefix('v2/override-pool')
+    ->middleware(['auth:sanctum'])
+    ->group(function () {
+        include base_path('routes/sequifi/v2/override-pool/auth.php');
+    });
