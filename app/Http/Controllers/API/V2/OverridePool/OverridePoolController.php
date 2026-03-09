@@ -241,8 +241,12 @@ class OverridePoolController extends Controller
         $request->validate(['year' => 'required|integer|min:2000|max:2100']);
         $year = (int) $request->input('year');
 
+        // Eligible agents = users who have at least one recruit under them
+        $eligibleAgentsCount = \App\Models\User::whereIn('id',
+            \App\Models\User::select('recruiter_id')->whereNotNull('recruiter_id')
+        )->count();
+
         $calcs = OverridePoolCalculation::where('year', $year)
-            ->selectRaw('COUNT(*) as eligible_agents_count')
             ->selectRaw('SUM(CASE WHEN q4_trueup < 0 THEN 1 ELSE 0 END) as overpaid_agents_count')
             ->selectRaw('COALESCE(SUM(total_pool_payment), 0) as total_pool_amount')
             ->first();
@@ -259,7 +263,7 @@ class OverridePoolController extends Controller
             'status'  => true,
             'year'    => $year,
             'data'    => [
-                'eligible_agents_count' => (int) $calcs->eligible_agents_count,
+                'eligible_agents_count' => $eligibleAgentsCount,
                 'overpaid_agents_count' => (int) $calcs->overpaid_agents_count,
                 'total_pool_amount'     => round($totalPoolAmount, 2),
                 'total_advances'        => round((float) $totalAdvances, 2),
