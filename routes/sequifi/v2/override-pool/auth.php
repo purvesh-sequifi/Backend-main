@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Dashboard summary widgets (eligible agents, overpaid count, pool total, advances, Q4 true-up)
+Route::get('/dashboard', [OverridePoolController::class, 'dashboard']);
+
 // Trigger or retrieve pool calculation for a given year
 Route::get('/calculate', [OverridePoolController::class, 'calculate']);
 

@@ -221,6 +221,54 @@ class OverridePoolController extends Controller
     }
 
     // -------------------------------------------------------------------------
+    // Dashboard Widgets
+    // -------------------------------------------------------------------------
+
+    /**
+     * Return aggregated dashboard widget data for a given year.
+     *
+     * GET /api/v2/override-pool/dashboard?year=2025
+     *
+     * Returns:
+     *   eligible_agents_count  - number of agents with a pool calculation
+     *   overpaid_agents_count  - number of agents where q4_trueup < 0
+     *   total_pool_amount      - sum of total_pool_payment across all eligible agents
+     *   total_advances         - sum of all Q1+Q2+Q3 advance amounts for the year
+     *   q4_trueup_total        - total_pool_amount minus total_advances
+     */
+    public function dashboard(Request $request): JsonResponse
+    {
+        $request->validate(['year' => 'required|integer|min:2000|max:2100']);
+        $year = (int) $request->input('year');
+
+        $calcs = OverridePoolCalculation::where('year', $year)
+            ->selectRaw('COUNT(*) as eligible_agents_count')
+            ->selectRaw('SUM(CASE WHEN q4_trueup < 0 THEN 1 ELSE 0 END) as overpaid_agents_count')
+            ->selectRaw('COALESCE(SUM(total_pool_payment), 0) as total_pool_amount')
+            ->first();
+
+        $totalAdvances = OverridePoolQuarterlyAdvance::where('year', $year)
+            ->selectRaw('COALESCE(SUM(q1_advance + q2_advance + q3_advance), 0) as total_advances')
+            ->value('total_advances') ?? 0;
+
+        $totalPoolAmount = (float) $calcs->total_pool_amount;
+        $q4TrueupTotal   = $totalPoolAmount - (float) $totalAdvances;
+
+        return response()->json([
+            'ApiName' => 'override-pool/dashboard',
+            'status'  => true,
+            'year'    => $year,
+            'data'    => [
+                'eligible_agents_count' => (int) $calcs->eligible_agents_count,
+                'overpaid_agents_count' => (int) $calcs->overpaid_agents_count,
+                'total_pool_amount'     => round($totalPoolAmount, 2),
+                'total_advances'        => round((float) $totalAdvances, 2),
+                'q4_trueup_total'       => round($q4TrueupTotal, 2),
+            ],
+        ], 200);
+    }
+
+    // -------------------------------------------------------------------------
     // Pool Percentage Tiers (Configurable Rules)
     // -------------------------------------------------------------------------
 
