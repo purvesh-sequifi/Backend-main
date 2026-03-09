@@ -1,0 +1,215 @@
+{
+    "field_mappings": {
+        "api_to_db": {
+            "pcc_id": {
+                "db_field": "pid",
+                "type": "integer",
+                "required": false
+            },
+            "branch_id": {
+                "db_field": "legacy_id",
+                "type": "string",
+                "required": true,
+                "transform": "branch_id_transform"
+            },
+            "customer_name": {
+                "db_field": "customer_name",
+                "type": "string",
+                "required": false
+            },
+            "customer_phone": {
+                "db_field": "customer_phone",
+                "type": "string",
+                "required": false
+            },
+            "customer_address": {
+                "db_field": "customer_address",
+                "type": "string",
+                "required": false
+            },
+            "customer_state": {
+                "db_fields": [
+                    "customer_state",
+                    "location_code"
+                ],
+                "type": "string",
+                "required": false
+            },
+            "customer_city": {
+                "db_field": "customer_city",
+                "type": "string",
+                "required": false
+            },
+            "customer_zip": {
+                "db_field": "customer_zip",
+                "type": "string",
+                "required": false
+            },
+            "product": {
+                "db_field": "product",
+                "type": "string",
+                "required": false
+            },
+            "product_id": {
+                "db_field": "product_id",
+                "type": "integer",
+                "required": false
+            },
+            "product_code": {
+                "db_field": "product_code",
+                "type": "string",
+                "required": false
+            },
+            "gross_account_value": {
+                "db_field": "gross_account_value",
+                "type": "decimal",
+                "required": false
+            },
+            "customer_signoff": {
+                "db_field": "customer_signoff",
+                "type": "datetime",
+                "required": false
+            },
+            "customer_email": {
+                "db_field": "customer_email",
+                "type": "string",
+                "required": false
+            },
+            "sales_rep_email": {
+                "db_field": "sales_rep_email",
+                "type": "string",
+                "required": false
+            },
+            "salesperson_name": {
+                "db_field": "sales_rep_name",
+                "type": "string",
+                "required": false
+            },
+            "date_cancelled": {
+                "db_field": "date_cancelled",
+                "type": "datetime",
+                "required": false
+            },
+            "length_of_agreement": {
+                "db_field": "length_of_agreement",
+                "type": "integer",
+                "required": false
+            },
+            "service_schedule": {
+                "db_field": "service_schedule",
+                "type": "string",
+                "required": false
+            },
+            "initial_service_cost": {
+                "db_field": "initial_service_cost",
+                "type": "decimal",
+                "required": false
+            },
+            "subscription_payment": {
+                "db_field": "subscription_payment",
+                "type": "decimal",
+                "required": false
+            },
+            "card_on_file": {
+                "db_field": "card_on_file",
+                "type": "string",
+                "required": false,
+                "transform": "boolean_to_yes_no"
+            },
+            "autopay": {
+                "db_field": "auto_pay",
+                "type": "string",
+                "required": false,
+                "transform": "boolean_to_yes_no"
+            },
+            "service_completion_date": {
+                "db_field": "last_service_date",
+                "type": "datetime",
+                "required": false
+            },
+            "service_completed": {
+                "db_field": "service_completed",
+                "type": "integer",
+                "required": false
+            },
+            "initial_service_date": {
+                "db_fields": [
+                    "m1_date",
+                    "initial_service_date"
+                ],
+                "type": "datetime",
+                "required": false,
+                "transform": "initial_service_date_transform"
+            }
+        },
+        "computed_fields": {
+            "bill_status": {
+                "type": "string",
+                "required": true,
+                "transform": "compute_bill_status"
+            },
+            "job_status": {
+                "type": "string",
+                "required": true,
+                "transform": "compute_job_status"
+            },
+            "install_complete_date": {
+                "type": "datetime",
+                "required": false
+            },
+            "m2_date": {
+                "type": "datetime",
+                "required": false
+            },
+            "trigger_date": {
+                "type": "json",
+                "required": false,
+                "transform": "compute_trigger_date"
+            },
+            "import_to_sales": {
+                "type": "boolean",
+                "required": false,
+                "transform": "compute_import_to_sales"
+            },
+            "data_source_type": {
+                "type": "string",
+                "required": true,
+                "default": "Pocomos"
+            }
+        }
+    },
+    "transformers": {
+        "branch_id_transform": {
+            "description": "Transform branch_id into legacy_id format",
+            "template": "Branch-{branch_id}"
+        },
+        "boolean_to_yes_no": {
+            "description": "Transform 1/0 to Yes/No",
+            "rules": {
+                "1": "Yes",
+                "default": "No"
+            }
+        },
+        "compute_bill_status": {
+            "description": "Compute bill status based on business logic"
+        },
+        "compute_job_status": {
+            "description": "Compute job status based on business logic"
+        },
+        "initial_service_date_transform": {
+            "description": "Transform initial service date for both m1_date and initial_service_date fields",
+            "fields": ["m1_date", "initial_service_date"]
+        },
+        "compute_trigger_date": {
+            "description": "Compute and JSON encode trigger dates"
+        },
+        "compute_import_to_sales": {
+            "description": "Determine if record should be imported to sales"
+        }
+    },
+    "metadata": {
+        "version": "1.0",
+        "last_updated": "2025-07-02",
+        "description": "Field mapping configuration for Pocomos data import"
+    }
+}

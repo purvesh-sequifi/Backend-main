@@ -1,0 +1,945 @@
+openapi: 3.0.0
+info:
+  title: Sequifi Swagger
+  description: |-
+    Sequifi
+
+    _`You can provide api-key either to the request body or click on Authorize button right below and provide there.`_
+  contact:
+    email: gary@sequifi.in
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Sequifi
+  url: https://sequifi.com/about-us.html
+servers:
+  - url: /public/api
+tags:
+  - name: Sale
+    description: Create Or Update Sale
+  - name: Hiring
+    description: Employee Hiring
+paths:
+  /create-sale:
+    post:
+      tags:
+        - Sale
+      security:
+        - api-key: [ ]
+      summary: Create Or Update sale
+      description: Create Or Update Sale
+      operationId: salecreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sale'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Sale'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Sale'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaleSuccessResponse'
+        '401':
+          description: Unauthorized operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Response'
+        '422':
+          description: validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale422Response'
+        '500':
+          description: server exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale500Response'
+  /departments-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: [ ]
+      summary: Department List
+      description: Department List
+      operationId: department-list
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentListSuccessResponse'
+        '401':
+          description: Unauthorized operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Response'
+  /recruiter-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: [ ]
+      summary: Recruter List
+      description: Recruter List
+      operationId: recruiter-list
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterListSuccessResponse'
+        '401':
+          description: Unauthorized operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Response'
+  /positions-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: [ ]
+      summary: Positions List
+      description: Positions List
+      operationId: positions-list
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionsListSuccessResponse'
+        '401':
+          description: Unauthorized operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Response'
+  /manager-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: [ ]
+      summary: Manager List
+      description: Manager List
+      operationId: manager-list
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerListSuccessResponse'
+        '401':
+          description: Unauthorized operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Response'
+  /create-employee:
+    post:
+      tags:
+        - Hiring
+      security:
+        - api-key: [ ]
+      summary: Create Employee
+      description: Create Employee
+      operationId: create-employee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmployee'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CreateEmployee'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateEmployee'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaleSuccessResponse'
+        '401':
+          description: Unauthorized operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Response'
+        '422':
+          description: validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale422Response'
+        '500':
+          description: server exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale500Response'
+components:
+  schemas:
+    Sale:
+      type: object
+      required:
+        - pid
+        - customer_name
+        - customer_state
+        - general_code
+        - gross_account_value
+        - epc
+        - net_epc
+        - kw
+        - approved_date
+        - setter_email
+        - closer_email
+      properties:
+        api-key:
+          type: string
+          description: |-
+            - API secret key which you got from sequifi
+        pid:
+          type: string
+          example: SEQ0001
+          pattern: "^[^\\s]+$"
+          description: |-
+            - No space allowed
+        customer_name:
+          type: string
+          minLength: 2
+          description: |-
+            - Customer Name is mandatory
+            - Min 2 char is mandatory
+        prospect_id:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Prospect Id Data
+        customer_address:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Customer Address Data
+        homeowner_id:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Homeowner Id Data
+        customer_address2:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Customer Address 2 Data
+        proposal_id:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Proposal Id Data
+        customer_city:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Customer City Data
+        product:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Product Data
+        gross_account_value:
+          type: string
+          minLength: 0
+          maxLength: 9999
+          description: |-
+            - Gross Account Value has to be in between 0 to 9999
+        installer:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Installer Partner Data
+        customer_zip:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Customer Zip Data
+        job_status:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Joib Status Data
+        kw:
+          type: integer
+          format: int64
+          example: 10
+          minLength: 0
+          maxLength: 9999
+          description: |-
+            - Kilowatt's Value has to be in between 0 to 9999
+        customer_email:
+          type: string
+          pattern: /^\S+@\S+\.\S+$/
+          description: |-
+            - Customer Email has to be valid email if you are entering
+        epc:
+          type: integer
+          format: int64
+          example: 3.5
+          minLength: 0
+          maxLength: 9999
+          description: |-
+            - EPC Value has to be in between 0 to 9999
+        customer_phone:
+          type: string
+          description: |-
+            - Min 8 and max 15 char is mandatory if you are entering the Customer Phone Data
+        net_epc:
+          type: integer
+          format: int64
+          example: 3.6
+          minLength: 0
+          maxLength: 9999
+          description: |-
+            - Net EPC Value has to be in between 0 to 9999
+        m1_date:
+          type: string
+          format: date
+          description: |-
+            - M1 date has to be in format of Y-m-d
+        m2_date:
+          type: string
+          format: date
+          description: |-
+            - M2 date has to be in format of Y-m-d
+            - M2 date has to be greater then m1 date
+        approved_date:
+          type: string
+          format: date
+          description: |-
+            - Approved Date has to be in format of Y-m-d
+        dealer_fee_percentage:
+          type: integer
+          format: int64
+          example: 3.6
+          description: |-
+            - Dealer Fee Percentage has to be in between 0 to 100 if you are providing the data
+        dealer_fee_amount:
+          type: integer
+          format: int64
+          example: 3.6
+          description: |-
+            - Dealer Fee Amount has to be in between 0 to 9999 if you are providing the data
+        show:
+          type: integer
+          format: int64
+          example: 20
+        adders_description:
+          type: string
+          description: |-
+            - Min 2 char is mandatory if you are entering the Customer Phone Data
+        customer_state:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: |-
+            - Customer State is mandatory
+            - Min 2 and max 100 char is mandatory for Customer State
+        general_code:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: |-
+            - General Code is mandatory
+            - General Code is based on Customer State
+            - Min 2 and max 100 char is mandatory for Customer State
+        closer_email:
+          type: string
+          example: example@gmail.com
+          pattern: /^\S+@\S+\.\S+$/
+          description: |-
+            - Closer Email is mandatory
+            - Closer Email has to match in our records
+            - Closer Email has to be valid email
+        setter_email:
+          type: string
+          example: example@gmail.com
+          pattern: /^\S+@\S+\.\S+$/
+          description: |-
+            - Setter Email is mandatory
+            - Setter Email has to match in our records
+            - Setter Email has to be valid email
+        closer_2_email:
+          type: string
+          example: example@gmail.com
+          pattern: /^\S+@\S+\.\S+$/
+          description: |-
+            - Closer 2 Email has to match in our records if you providing an email
+            - Closer 2 Email has to be valid email if you providing an email
+        setter_2_email:
+          type: string
+          example: example@gmail.com
+          pattern: /^\S+@\S+\.\S+$/
+          description: |-
+            - Setter 2 Email has to match in our records if you providing an email
+            - Setter 2 Email has to be valid email if you providing an email
+      xml:
+        name: order
+    SaleSuccessResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        Message:
+          type: string
+          example: Add Data successfully
+      xml:
+        name: Sale
+    Sale422Response:
+      type: object
+      properties:
+        message:
+          type: string
+          example: corresponding error message
+        errors:
+          type: object
+          properties:
+            request_key:
+              type: string
+              example: error message
+      xml:
+        name: Sale
+    Sale500Response:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        Message:
+          type: string
+          example: Something went wrong while creating or updating sale.
+      xml:
+        name: Sale
+    401Response:
+      type: object
+      properties:
+        message:
+          type: string
+          example: API key is missing.
+      xml:
+        name: Sale
+    DepartmentListSuccessResponse:
+      type: object
+      properties:
+        ApiName:
+          type: string
+          example: departments-list
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: All Departments!
+        data:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Department'
+      xml:
+        name: Hiring
+    RecruiterListSuccessResponse:
+      type: object
+      properties:
+        ApiName:
+          type: string
+          example: recruiter-list
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: All Recruiters!
+        data:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Recruiter'
+      xml:
+        name: Hiring
+    PositionsListSuccessResponse:
+      type: object
+      properties:
+        ApiName:
+          type: string
+          example: positions-list
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: All Positions!
+        data:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Position'
+      xml:
+        name: Hiring
+    ManagerListSuccessResponse:
+      type: object
+      properties:
+        ApiName:
+          type: string
+          example: manager-list
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: All Managers!
+        data:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Manager'
+      xml:
+        name: Hiring
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      xml:
+        name: tag
+    Recruiter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        employee_id:
+          type: string
+      xml:
+        name: tag
+    Position:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        position_name:
+          type: string
+        department_id:
+          type: integer
+          format: int64
+      xml:
+        name: tag
+    Manager:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+        last_name:
+          type: string
+        state_id:
+          type: integer
+          format: int64
+        office_id:
+          type: integer
+          format: int64
+      xml:
+        name: tag
+    CreateEmployee:
+      type: object
+      required: 
+        - first_name
+        - last_name
+        - personal_email
+        - phone_number
+        - worksite_id
+        - department_id
+        - position_id
+        - is_manager
+        - self_gen
+        - direct_override_value
+        - direct_override_type
+        - indirect_override_value
+        - indirect_override_type
+        - period_of_agreement_start_date
+        - period_of_agreement_end_date
+        - offer_expire_date
+        - date_to_be_paid
+        - s_clearance_background_check
+      properties:
+        api-key:
+          type: string
+          description: |-
+            - API secret key which you got from sequifi
+        first_name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: |-
+            - First Name is mandatory
+            - Min 2 char is mandatory and it can go up to 100
+        last_name:
+          type: string
+          minLength: 2
+          description: |-
+            - Last Name is mandatory
+            - Min 2 char is mandatory and it can go up to 100
+        personal_email:
+          type: string
+          pattern: /^\S+@\S+\.\S+$/
+          description: |-
+            - Personal Email has to be valid email
+            - Personal Email has to be unique email
+        phone_number:
+          type: string
+          minLength: 10
+          maxLength: 15
+          description: |-
+            - Min 10 and max 15 char is mandatory
+            - Phone Number has to be unique number
+        worksite_id:
+          type: string
+          description: |-
+            - Work site id is mandatory
+            - Work site id has to be valid id
+        department_id:
+          type: string
+          description: |-
+            - Department id is mandatory
+            - Department id has to be valid id
+        position_id:
+          type: string
+          description: |-
+            - Position id is mandatory
+            - Position id has to be valid id
+        is_manager:
+          type: string
+          enum:
+            - 0 - If not manager
+            - 1 - If manager
+          description: |-
+            - Is Manager field is mandatory
+            - 0 if not manager / 1 if manager
+        manager_id:
+          type: string
+          description: |-
+            - If is manager id 1 then Manager id is mandatory
+            - Manager id has to be valid id
+        self_gen:
+          type: string
+          enum:
+            - 0 - If user is not self gen
+            - 1 - If user is self gen
+          description: |-
+            - Self gen field is mandatory
+            - 0 If user is not self gen / 1 If user is self gen
+        self_gen_commission:
+          type: string
+          description: |-
+            - Self gen commission if required
+            - Min 0 char is mandatory and it can go up to 100
+        recruiter_id:
+          type: string
+          description: |-
+            - If user has any recruter then pass the recruter id
+        setter_commission_value:
+          type: integer
+          format: int64
+          min: 1
+          max: 100
+          description: |-
+            - Setter commission value is mandatory if selected position or parent position is setter
+            - Setter commission value is mandatory in case of self gen user
+            - Min 1 percent is mandatory and it can go up to 100
+        setter_commission_type:
+          type: string
+          enum:
+            - percent
+          description: |-
+            - Setter commission type is mandatory if selected position or parent position is setter
+            - Setter commission type is mandatory in case of self gen user
+        setter_redline_type:
+          type: string
+          enum:
+            - per watt
+          description: |-
+            - Setter redline type is mandatory if selected position or parent position is setter
+            - Setter redline type is mandatory in case of self gen user
+        setter_redline:
+          type: string
+          min: 0
+          max: 999
+          description: |-
+            - Setter redline is mandatory if selected position or parent position is setter
+            - Setter redline is mandatory in case of self gen user
+            - Min 0 is mandatory and it can go up to 999
+        setter_redline_amount_type:
+          type: string
+          enum:
+            - Shift based on Location
+            - Fixed
+          description: |-
+            - Setter redline amount type is mandatory if selected position or parent position is setter
+            - Setter redline amount is mandatory in case of self gen user
+        setter_upfront_value:
+          type: integer
+          format: int64
+          min: 1
+          description: |-
+            - Setter upfront amount is mandatory if selected position or parent position is setter
+            - Setter upfront amount is mandatory in case of self gen user
+        setter_upfront_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+          description: |-
+            - Setter upfront type is mandatory if selected position or parent position is setter
+            - Setter upfront type is mandatory in case of self gen user
+        setter_withheld_value:
+          type: integer
+          format: int64
+          min: 1
+          description: |-
+            - Setter withheld amount has to be an integer if you are passing value on it
+        setter_withheld_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+          description: |-
+            - Setter withheld type has to be one of the given if you are passing value on it
+        closer_commission_value:
+          type: integer
+          format: int64
+          min: 1
+          max: 100
+          description: |-
+            - Closer commission value is mandatory if selected position or parent position is Closer
+            - Closer commission value is mandatory in case of self gen user
+            - Min 1 percent is mandatory and it can go up to 100
+        closer_commission_type:
+          type: string
+          enum:
+            - percent
+          description: |-
+            - Closer commission type is mandatory if selected position or parent position is Closer
+            - Closer commission type is mandatory in case of self gen user
+        closer_redline_type:
+          type: string
+          enum:
+            - per watt
+          description: |-
+            - Closer redline type is mandatory if selected position or parent position is Closer
+            - Closer redline type is mandatory in case of self gen user
+        closer_redline:
+          type: string
+          min: 0
+          max: 999
+          description: |-
+            - Closer redline is mandatory if selected position or parent position is Closer
+            - Closer redline is mandatory in case of self gen user
+            - Min 0 is mandatory and it can go up to 999
+        closer_redline_amount_type:
+          type: string
+          enum:
+            - Shift based on Location
+            - Fixed
+          description: |-
+            - Closer redline amount type is mandatory if selected position or parent position is Closer
+            - Closer redline amount is mandatory in case of self gen user
+        closer_upfront_value:
+          type: integer
+          format: int64
+          min: 1
+          description: |-
+            - Closer upfront amount is mandatory if selected position or parent position is Closer
+            - Closer upfront amount is mandatory in case of self gen user
+        closer_upfront_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+          description: |-
+            - Closer upfront type is mandatory if selected position or parent position is Closer
+            - Closer upfront type is mandatory in case of self gen user
+        closer_withheld_value:
+          type: integer
+          format: int64
+          min: 1
+          description: |-
+            - Closer withheld amount has to be an integer if you are passing value on it
+        closer_withheld_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+          description: |-
+            - Closer withheld type has to be one of the given if you are passing value on it
+        office_overrides_amount:
+          type: integer
+          format: int64
+          description: |-
+            - Office override amount has to be integer if you are passing it
+        office_overrides_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+            - percent
+          description: |-
+            - Office override type has to be one of the given if you are passing value on it
+        office_stack_overrides_amount:
+          type: integer
+          format: int64
+          min: 0
+          max: 100
+          description: |-
+            - Office stack override amount has to be integer if you are passing it
+            - Office stack override amount has to be in between 0 to 100
+        direct_override_value:
+          type: integer
+          format: int64
+          description: |-
+            - Direct override value is mandatory
+        direct_override_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+            - percent
+          description: |-
+            - Direct override type is mandatory and has to be one of the type given below
+        indirect_override_value:
+          type: integer
+          format: int64
+          description: |-
+            - Indirect override value is mandatory
+        indirect_override_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+            - percent
+          description: |-
+            - Indirect override type is mandatory and has to be one of the type given below
+        probation_period:
+          type: string
+          enum:
+            - 30
+            - 60
+          description: |-
+            - Probation period has to be one of the below if you are passing it
+        period_of_agreement_start_date:
+          type: string
+          format: date
+          description: |-
+            - Period of agreement start date is mandatory and has to be in format of Y-m-d
+        period_of_agreement_end_date:
+          type: string
+          format: date
+          description: |-
+            - Period of agreement end date is mandatory and has to be in format of Y-m-d
+            - Period of agreement end date has to be future date then the start date
+        offer_expire_date:
+          type: string
+          format: date
+          description: |-
+            - Offer Expire Date is mandatory and has to be in format of Y-m-d
+            - Offer Expire Date has to be future date then the today's date
+        date_to_be_paid:
+          type: string
+          format: date
+          description: |-
+            - Date To Be Paid is mandatory and has to be in format of Y-m-d
+            - Date To Be Paid has to be future date then the today's date
+        s_clearance_background_check:
+          type: string
+          enum:
+            - 0
+            - 1
+          description: |-
+            - Background check is mandatory and has to be one of the below
+        hiring_bonus_amount:
+          type: string
+          description: |-
+            - Hiring Bonus Amount if any
+        team_id:
+          type: string
+          description: |-
+            - Team Id if any
+        is_offer_includes_bonus:
+          type: string
+          enum:
+            - 0
+            - 1
+          description: |-
+            - Office includes bonus is mandatory and has to be one of the below
+        additional_office:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/AdditionalOffice'
+      xml:
+        name: order
+    AdditionalOffice:
+      type: object
+      required:
+        - worksite_id
+        - overrides_amount
+        - overrides_type
+      properties:
+        worksite_id:
+          type: string
+          description: |-
+            - Work site id is mandatory
+            - Work site id has to be valid id
+        overrides_amount:
+          type: integer
+          format: int64
+          description: |-
+            - Office override amount has to be integer if you are passing it
+        overrides_type:
+          type: string
+          enum:
+            - per sale
+            - per kw
+            - percent
+          description: |-
+            - Override type has to be one of the given if you are passing value on it
+      xml:
+        name: tag
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header

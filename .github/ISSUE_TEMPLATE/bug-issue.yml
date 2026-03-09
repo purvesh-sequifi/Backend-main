@@ -1,0 +1,72 @@
+name: SEQ New Issue
+description: Template for tracking client-related issues
+title: '[Issue]: '
+labels: []
+assignees: []
+
+body:
+    - type: textarea
+      id: description
+      attributes:
+          label: Description
+          description: Detailed description of the issue
+          placeholder: Provide a comprehensive description of the issue
+      validations:
+          required: true
+
+    - type: input
+      id: client-name
+      attributes:
+          label: Client Name
+          description: Name of the client related to this issue
+          placeholder: Enter client name
+      validations:
+          required: true
+
+    - type: input
+      id: requestor
+      attributes:
+          label: Requested By
+          description: Name of the person who raised this concern
+          placeholder: Enter Requested By
+      validations:
+          required: true
+
+    - type: input
+      id: functional-area
+      attributes:
+          label: Functional Area
+          description: Specify the functional area this issue belongs to
+          placeholder: e.g., Frontend, Backend, Database, DevOps, etc.
+      validations:
+          required: true
+
+    - type: dropdown
+      id: priority
+      attributes:
+          label: Priority
+          description: Select the priority level for this issue
+          options:
+              - Critical
+              - High
+              - Medium
+              - Low
+      validations:
+          required: true
+
+    - type: textarea
+      id: rca
+      attributes:
+          label: Root Cause Analysis (RCA)
+          description: Document the root cause analysis for this issue. This must be filled before closing the ticket.
+          placeholder: |
+              **What happened:**
+              
+              **Why it happened:**
+              
+              **How it was fixed:**
+              
+              **Prevention measures:**
+      validations:
+          required: false
+

@@ -1,0 +1,329 @@
+name: Prod Servers Backend Deployments
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DEPLOY_USER: "ubuntu"
+  DEPLOY_PATH: "/var/www/backend"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Allow all deployments to complete even if one fails
+      max-parallel: 10  # Deploy 10 servers at a time to avoid SSH timeouts
+      matrix:
+        include:
+ 
+          - name: embrase.sequifi.com
+            host: "52.8.104.105"
+            ssm_param: "/backend/embrase"
+            concurrency_group: "embrase-deployment"
+
+          - name: fastfiber.sequifi.com
+            host: "52.9.94.15"
+            ssm_param: "/backend/fastfiber"
+            concurrency_group: "fastfiber-deployment"
+
+          - name: flexpwr.sequifi.com
+            host: "54.153.43.23"
+            ssm_param: "/backend/flexpwr"
+            concurrency_group: "flexpwr-deployment"
+
+          - name: homeguard.sequifi.com
+            host: "52.52.48.248"
+            ssm_param: "/backend/homeguard"
+            concurrency_group: "homeguard-deployment"
+
+          - name: momentum.sequifi.com
+            host: "52.9.121.94"
+            ssm_param: "/backend/momentum"
+            concurrency_group: "momentum-deployment"
+
+          - name: onyx.sequifi.com
+            host: "13.52.122.43"
+            ssm_param: "/backend/onyx"
+            concurrency_group: "onyx-deployment"
+
+          - name: sesolar.sequifi.com
+            host: "13.52.54.222"
+            ssm_param: "/backend/sesolar"
+            concurrency_group: "sesolar-deployment"
+
+          - name: adam.sequifi.com
+            host: "204.236.185.199"
+            ssm_param: "/backend/adam"
+            concurrency_group: "adam-deployment"
+            
+          - name: gulfbank.sequifi.com
+            host: "54.183.62.253"
+            ssm_param: "/backend/gulfbank"
+            concurrency_group: "gulfbank-deployment"
+
+          - name: milestonemortgagesolutions.sequifi.com
+            host: "52.9.86.199"
+            ssm_param: "/backend/milestonemortgagesolutions"
+            concurrency_group: "milestonemortgagesolutions-deployment"
+            
+          - name: threeriverspest.sequifi.com
+            host: "184.169.253.205"
+            ssm_param: "/backend/threeriverspest"
+            concurrency_group: "threeriverspest-deployment"
+            
+          - name: vntg.sequifi.com
+            host: "52.52.128.200"
+            ssm_param: "/backend/vntg"
+            concurrency_group: "vntg-deployment"
+            
+          - name: sourcemrktg.sequifi.com
+            host: "54.219.104.234"
+            ssm_param: "/backend/sourcemrktg"
+            concurrency_group: "sourcemrktg-deployment"
+            
+          - name: socosolar.sequifi.com
+            host: "52.52.218.91"
+            ssm_param: "/backend/socosolar"
+            concurrency_group: "socosolar-deployment"
+            
+          - name: actionsolar.sequifi.com
+            host: "54.151.101.21"
+            ssm_param: "/backend/actionsolar"
+            concurrency_group: "actionsolar-deployment"
+            
+          - name: homex2.sequifi.com
+            host: "54.153.71.138"
+            ssm_param: "/backend/homex2"
+            concurrency_group: "homex2-deployment"
+            
+          - name: aveyo.sequifi.com
+            host: "13.57.111.206"
+            ssm_param: "/backend/aveyo"
+            concurrency_group: "aveyo-deployment"
+            
+          - name: chipr.sequifi.com
+            host: "18.144.175.39"
+            ssm_param: "/backend/chipr"
+            concurrency_group: "chipr-deployment"
+               
+          - name: directsales.sequifi.com
+            host: "54.183.117.10"
+            ssm_param: "/backend/directsales"
+            concurrency_group: "directsales-deployment"
+            
+          - name: evomarketing.sequifi.com
+            host: "54.183.124.245"
+            ssm_param: "/backend/evomarketing"
+            concurrency_group: "evomarketing-deployment"
+
+          - name: firstcoast.sequifi.com
+            host: "52.52.70.68"
+            ssm_param: "/backend/firstcoast"
+            concurrency_group: "firstcoast-deployment"
+
+          - name: glide.sequifi.com
+            host: "54.241.164.78"
+            ssm_param: "/backend/glide"
+            concurrency_group: "glide-deployment"
+          
+          - name: gosales.sequifi.com
+            host: "52.9.170.212"
+            ssm_param: "/backend/gosales"
+            concurrency_group: "gosales-deployment"
+          
+          - name: homexfiber.sequifi.com
+            host: "52.52.72.241"
+            ssm_param: "/backend/homexfiber"
+            concurrency_group: "homexfiber-deployment"
+          
+          - name: joinesp.sequifi.com
+            host: "54.177.105.71"
+            ssm_param: "/backend/joinesp"
+            concurrency_group: "joinesp-deployment"
+          
+          - name: kin.sequifi.com
+            host: "52.9.39.42"
+            ssm_param: "/backend/kin"
+            concurrency_group: "kin-deployment"
+          
+          - name: pcs.sequifi.com
+            host: "54.193.141.248"
+            ssm_param: "/backend/pcs"
+            concurrency_group: "pcs-deployment"
+          
+          - name: phoenixlending.sequifi.com
+            host: "54.241.234.198"
+            ssm_param: "/backend/phoenixlending"
+            concurrency_group: "phoenixlending-deployment"
+          
+          - name: poweredalliance.sequifi.com
+            host: "54.241.19.100"
+            ssm_param: "/backend/poweredalliance"
+            concurrency_group: "poweredalliance-deployment"
+          
+          - name: serviipro.sequifi.com
+            host: "52.52.12.224"
+            ssm_param: "/backend/serviipro"
+            concurrency_group: "serviipro-deployment"
+            
+          - name: strategicmortgageadvisors.sequifi.com
+            host: "52.8.78.61"
+            ssm_param: "/backend/strategicmortgageadvisors"
+            concurrency_group: "strategicmortgageadvisors-deployment"
+
+          - name: serviiprov2.sequifi.com
+            host: "52.52.94.32"
+            ssm_param: "/backend/serviiprov2"
+            concurrency_group: "serviiprov2-deployment"
+
+          - name: svrn.sequifi.com
+            host: "13.57.65.40"
+            ssm_param: "/backend/svrn"
+            concurrency_group: "svrn-deployment"
+
+          - name: utahimpact.sequifi.com
+            host: "54.177.208.245"
+            ssm_param: "/backend/utahimpact"
+            concurrency_group: "utahimpact-deployment"
+          
+          - name: rockstarconsulting.sequifi.com
+            host: "54.219.47.171"
+            ssm_param: "/backend/rockstarconsulting"
+            concurrency_group: "rockstarconsulting-deployment"
+            
+          - name: ironrod.sequifi.com
+            host: "184.169.242.100"
+            ssm_param: "/backend/ironrod"
+            concurrency_group: "ironrod-deployment"
+
+          - name: jma.sequifi.com
+            host: "52.52.58.181"
+            ssm_param: "/backend/jma"
+            concurrency_group: "jma-deployment"
+
+          - name: ryansales.sequifi.com
+            host: "13.57.144.26"
+            ssm_param: "/backend/ryansales"
+            concurrency_group: "ryansales-deployment"
+
+          - name: goelev8.sequifi.com
+            host: "54.177.81.39"
+            ssm_param: "/backend/goelev8"
+            concurrency_group: "goelev8-deployment"
+
+          - name: ace.sequifi.com
+            host: "52.53.60.5"
+            ssm_param: "/backend/ace"
+            concurrency_group: "ace-deployment"
+
+          - name: frdmturf.sequifi.com
+            host: "54.215.209.190"
+            ssm_param: "/backend/frdmturf"
+            concurrency_group: "frdmturf-deployment"
+
+          - name: gainz.sequifi.com
+            host: "50.18.195.103"
+            ssm_param: "/backend/gainz"
+            concurrency_group: "gainz-deployment"
+
+          - name: maine.sequifi.com
+            host: "204.236.160.211"
+            ssm_param: "/backend/maine"
+            concurrency_group: "maine-deployment"
+
+          - name: poweredalliance-services.sequifi.com
+            host: "54.153.24.90"
+            ssm_param: "/backend/poweredalliance-services"
+            concurrency_group: "poweredalliance-services-deployment"
+
+          - name: whiteknight.sequifi.com
+            host: "52.8.43.203"
+            ssm_param: "/backend/whiteknight"
+            concurrency_group: "whiteknight-deployment"
+
+          - name: capecod.sequifi.com
+            host: "54.177.149.132"
+            ssm_param: "/backend/capecod"
+            concurrency_group: "capecod-deployment"
+
+          - name: heliocore.sequifi.com
+            host: "54.215.36.219"
+            ssm_param: "/backend/heliocore"
+            concurrency_group: "heliocore-deployment"
+
+          - name: residesimpli.sequifi.com
+            host: "184.169.134.115"
+            ssm_param: "/backend/residesimpli"
+            concurrency_group: "residesimpli-deployment"
+
+          - name: tar.sequifi.com
+            host: "52.8.147.197"
+            ssm_param: "/backend/tar"
+            concurrency_group: "tar-deployment"
+            
+          - name: homex.sequifi.com
+            host: "50.18.105.150"
+            ssm_param: "/backend/homex"
+            concurrency_group: "homex-deployment"
+            
+          - name: nextphasefiber.sequifi.com
+            host: "54.151.111.220"
+            ssm_param: "/backend/nextphasefiber"
+            concurrency_group: "nextphasefiber-deployment"
+            
+          - name: rarediamond.sequifi.com
+            host: "204.236.153.139"
+            ssm_param: "/backend/rarediamond"
+            concurrency_group: "rarediamond-deployment"
+            
+          - name: rogue.sequifi.com
+            host: "52.9.235.182"
+            ssm_param: "/backend/rogue"
+            concurrency_group: "rogue-deployment"
+             
+          - name: nexus.sequifi.com
+            host: "52.52.188.133"
+            ssm_param: "/backend/nexus"
+            concurrency_group: "nexus-deployment"
+
+    concurrency:
+      group: ${{ matrix.concurrency_group }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to ${{ matrix.name }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SEQUIFI_PROD_KEY }}
+          timeout: 60s
+          command_timeout: 30m
+          script: |
+            set -e
+
+            DEPLOY_PATH="/var/www/backend"
+            DEPLOY_DIR="${DEPLOY_PATH}/${{ github.run_number }}"
+            SSM_PARAM="${{ matrix.ssm_param }}"
+
+            echo "Starting Deployment #${{ github.run_number }} to ${{ matrix.name }}"
+            echo "Using SSM Parameter: $SSM_PARAM"
+
+            sudo rm -rf "${DEPLOY_DIR}" 2>/dev/null || true
+            sudo mkdir -p "${DEPLOY_DIR}"
+
+            sudo git clone --branch="${{ github.ref_name }}" \
+              "https://x-token-auth:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+              "${DEPLOY_DIR}"
+
+            sudo chown -R www-data:www-data "${DEPLOY_DIR}"
+            sudo chmod +x "${DEPLOY_DIR}/scripts/deploy.sh"
+
+            cd "${DEPLOY_DIR}"
+            
+            sudo bash scripts/deploy.sh "${{ github.run_number }}" "${{ github.ref_name }}" "${{ github.sha }}" "$SSM_PARAM"

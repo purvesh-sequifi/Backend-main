@@ -1,0 +1,192 @@
+[
+    {
+      "excel_column": "LocationID+LocationCode",
+      "used_in_system": true,
+      "database_column_name": "pid",
+      "index": 0,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "FName+LName",
+      "used_in_system": true,
+      "database_column_name": "customer_name",
+      "index": 1,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Address",
+      "used_in_system": true,
+      "database_column_name": "customer_address",
+      "index": 2,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "City",
+      "used_in_system": true,
+      "database_column_name": "customer_city",
+      "index": 3,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "State",
+      "used_in_system": true,
+      "database_column_name": "customer_state",
+      "index": 4,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Zip",
+      "used_in_system": true,
+      "database_column_name": "customer_zip",
+      "index": 5,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Email",
+      "used_in_system": true,
+      "database_column_name": "customer_email",
+      "index": 6,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Phone",
+      "used_in_system": true,
+      "database_column_name": "customer_phone",
+      "index": 7,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "SalesName",
+      "used_in_system": true,
+      "database_column_name": "sales_rep_name",
+      "index": 8,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "SalesEmail",
+      "used_in_system": true,
+      "database_column_name": "sales_rep_email",
+      "index": 9,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "CompanyName",
+      "used_in_system": true,
+      "database_column_name": "install_partner",
+      "index": 10,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "SoldDate",
+      "used_in_system": true,
+      "database_column_name": "customer_signoff",
+      "index": 11,
+      "data_type": "date"
+    },
+    {
+      "excel_column": "InitialServiceCompleted",
+      "used_in_system": true,
+      "database_column_name": "m1_date",
+      "index": 12,
+      "data_type": "date"
+    },
+    {
+      "excel_column": "CancelDate",
+      "used_in_system": true,
+      "database_column_name": "date_cancelled",
+      "index": 13,
+      "data_type": "date"
+    },
+    {
+      "excel_column": "LastServiceDate",
+      "used_in_system": true,
+      "database_column_name": "last_service_date",
+      "index": 14,
+      "data_type": "date"
+    },
+    {
+      "excel_column": "Description",
+      "used_in_system": true,
+      "database_column_name": "product",
+      "index": 15,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Description",
+      "used_in_system": true,
+      "database_column_name": "product_id",
+      "index": 16,
+      "data_type": "int"
+    },
+    {
+      "excel_column": "Annual Value",
+      "used_in_system": true,
+      "database_column_name": "gross_account_value",
+      "index": 17,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "Schedule",
+      "used_in_system": true,
+      "database_column_name": "service_schedule",
+      "index": 18,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Initial Service Price",
+      "used_in_system": true,
+      "database_column_name": "initial_service_cost",
+      "index": 19,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "TotalServices",
+      "used_in_system": true,
+      "database_column_name": "service_completed",
+      "index": 20,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "RecurringService",
+      "used_in_system": true,
+      "database_column_name": "length_of_agreement",
+      "index": 21,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "Auto Pay",
+      "used_in_system": true,
+      "database_column_name": "auto_pay",
+      "index": 22,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Status of Account",
+      "used_in_system": true,
+      "database_column_name": "job_status",
+      "index": 23,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Balance",
+      "used_in_system": true,
+      "database_column_name": "bill_status",
+      "index": 24,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "RecurringSubtotal",
+      "used_in_system": true,
+      "database_column_name": "subscription_payment",
+      "index": 25,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "CancelReason",
+      "used_in_system": true,
+      "database_column_name": "adders_description",
+      "index": 26,
+      "data_type": "string"
+    }
+  ]
+  

@@ -1,0 +1,223 @@
+name: Enforce RCA Before Issue Close
+
+on:
+  issues:
+    types: [closed]
+
+env:
+  PROJECT_NUMBER: 3
+  ORG_NAME: sequifi
+  # Default status to restore to when reopening (change this to match your project)
+  DEFAULT_REOPEN_STATUS: "In Progress"
+
+jobs:
+  check-rca:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for RCA content
+        id: rca-check
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const issueBody = issue.body || '';
+            
+            // Check if issue was created from the bug-issue template (has RCA section)
+            const hasRcaSection = issueBody.includes('### Root Cause Analysis (RCA)');
+            
+            if (!hasRcaSection) {
+              console.log('Issue does not use the bug-issue template, skipping RCA check.');
+              core.setOutput('rca_missing', 'false');
+              return;
+            }
+            
+            // Extract RCA content
+            // Use lookahead for newline+### to only match section headers, not ### within content
+            const rcaMatch = issueBody.match(/### Root Cause Analysis \(RCA\)\s*([\s\S]*?)(?=\n###|$)/);
+            const rcaContent = rcaMatch ? rcaMatch[1].trim() : '';
+            
+            // Check if RCA is empty or only contains the placeholder template
+            const placeholderPatterns = [
+              '**What happened:**',
+              '**Why it happened:**',
+              '**How it was fixed:**',
+              '**Prevention measures:**',
+              '_No response_'
+            ];
+            
+            let isRcaEmpty = !rcaContent;
+            
+            if (!isRcaEmpty) {
+              // Remove placeholder text and check if anything meaningful remains
+              let cleanedContent = rcaContent;
+              for (const pattern of placeholderPatterns) {
+                cleanedContent = cleanedContent.replace(new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
+              }
+              cleanedContent = cleanedContent.replace(/\s+/g, '').trim();
+              isRcaEmpty = cleanedContent.length < 10; // Require at least 10 characters of actual content
+            }
+            
+            core.setOutput('rca_missing', isRcaEmpty ? 'true' : 'false');
+            
+            if (isRcaEmpty) {
+              // Reopen the issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'open'
+              });
+              
+              // Add a comment explaining why
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `⚠️ **Issue Reopened - RCA Required**\n\nThis issue cannot be closed until the **Root Cause Analysis (RCA)** section is completed.\n\nPlease update the issue description with:\n- **What happened:** Description of the issue\n- **Why it happened:** The root cause\n- **How it was fixed:** The solution implemented\n- **Prevention measures:** Steps to prevent recurrence\n\nOnce the RCA is filled in, you can close this issue again.`
+              });
+              
+              console.log(`Issue #${issue.number} reopened due to missing RCA.`);
+            } else {
+              console.log(`Issue #${issue.number} has valid RCA content. Closing allowed.`);
+            }
+
+      - name: Restore project status
+        if: steps.rca-check.outputs.rca_missing == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const issueNodeId = context.payload.issue.node_id;
+            const projectNumber = parseInt(process.env.PROJECT_NUMBER);
+            const orgName = process.env.ORG_NAME;
+            const defaultStatus = process.env.DEFAULT_REOPEN_STATUS;
+            
+            try {
+              // Get the project and its Status field
+              const projectQuery = `
+                query($org: String!, $projectNumber: Int!) {
+                  organization(login: $org) {
+                    projectV2(number: $projectNumber) {
+                      id
+                      field(name: "Status") {
+                        ... on ProjectV2SingleSelectField {
+                          id
+                          options {
+                            id
+                            name
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              const projectResult = await github.graphql(projectQuery, {
+                org: orgName,
+                projectNumber: projectNumber
+              });
+              
+              const project = projectResult.organization.projectV2;
+              if (!project) {
+                console.log('Project not found');
+                return;
+              }
+              
+              const statusField = project.field;
+              if (!statusField) {
+                console.log('Status field not found in project');
+                return;
+              }
+              
+              // Find the target status option
+              const targetOption = statusField.options.find(opt => opt.name === defaultStatus);
+              if (!targetOption) {
+                console.log(`Status "${defaultStatus}" not found. Available: ${statusField.options.map(o => o.name).join(', ')}`);
+                return;
+              }
+              
+              // Get the project item for this issue
+              const itemQuery = `
+                query($org: String!, $projectNumber: Int!, $cursor: String) {
+                  organization(login: $org) {
+                    projectV2(number: $projectNumber) {
+                      items(first: 100, after: $cursor) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              let cursor = null;
+              let projectItemId = null;
+              
+              // Paginate through project items to find the issue
+              while (true) {
+                const itemResult = await github.graphql(itemQuery, {
+                  org: orgName,
+                  projectNumber: projectNumber,
+                  cursor: cursor
+                });
+                
+                const items = itemResult.organization.projectV2.items;
+                const foundItem = items.nodes.find(item => 
+                  item.content && item.content.id === issueNodeId
+                );
+                
+                if (foundItem) {
+                  projectItemId = foundItem.id;
+                  break;
+                }
+                
+                if (!items.pageInfo.hasNextPage) break;
+                cursor = items.pageInfo.endCursor;
+              }
+              
+              if (!projectItemId) {
+                console.log('Issue not found in project');
+                return;
+              }
+              
+              // Update the status
+              const updateMutation = `
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId
+                    itemId: $itemId
+                    fieldId: $fieldId
+                    value: { singleSelectOptionId: $optionId }
+                  }) {
+                    projectV2Item {
+                      id
+                    }
+                  }
+                }
+              `;
+              
+              await github.graphql(updateMutation, {
+                projectId: project.id,
+                itemId: projectItemId,
+                fieldId: statusField.id,
+                optionId: targetOption.id
+              });
+              
+              console.log(`Issue project status restored to "${defaultStatus}"`);
+              
+            } catch (error) {
+              console.log(`Failed to restore project status: ${error.message}`);
+              // Don't fail the workflow - the issue is already reopened
+            }

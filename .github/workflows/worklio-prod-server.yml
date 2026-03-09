@@ -1,0 +1,190 @@
+name: worklio prod servers
+
+on:
+  push:
+    branches:
+      - main-worklio-octane
+
+env:
+  DEPLOY_USER: "ubuntu"
+  DEPLOY_PATH: "/var/www/backend"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Allow all deployments to complete even if one fails
+      max-parallel: 10  # Deploy 10 servers at a time to avoid SSH timeouts
+      matrix:
+        include:
+ 
+          - name: sequifi.sequifi.com
+            host: "13.52.43.225"
+            ssm_param: "/backend/sequifi"
+            concurrency_group: "sequifi-deployment"
+
+          - name: primepestandlawn.sequifi.com
+            host: "54.219.93.223"
+            ssm_param: "/backend/primepestandlawn"
+            concurrency_group: "primepestandlawn-deployment"
+
+          - name: solvepestorlando.sequifi.com
+            host: "54.176.214.42"
+            ssm_param: "/backend/solvepestorlando"
+            concurrency_group: "solvepestorlando-deployment"
+
+          - name: solvepestraleigh.sequifi.com
+            host: "52.8.41.10"
+            ssm_param: "/backend/solvepestraleigh"
+            concurrency_group: "solvepestraleigh-deployment"
+
+          - name: ateamsolar.sequifi.com
+            host: "204.236.173.130"
+            ssm_param: "/backend/ateamsolar"
+            concurrency_group: "ateamsolar-deployment"
+
+          - name: insightpestfl.sequifi.com
+            host: "54.215.73.12"
+            ssm_param: "/backend/insightpestfl"
+            concurrency_group: "insightpestfl-deployment"
+
+          - name: insightpestal.sequifi.com
+            host: "52.9.53.214"
+            ssm_param: "/backend/insightpestal"
+            concurrency_group: "insightpestal-deployment"
+
+          - name: insightpestmt.sequifi.com
+            host: "54.151.80.107"
+            ssm_param: "/backend/insightpestmt"
+            concurrency_group: "insightpestmt-deployment"
+
+          - name: ateamroofing.sequifi.com
+            host: "54.241.208.45"
+            ssm_param: "/backend/ateamroofing"
+            concurrency_group: "ateamroofing-deployment"
+
+          - name: c1m.sequifi.com
+            host: "54.176.224.130"
+            ssm_param: "/backend/c1m"
+            concurrency_group: "c1m-deployment"
+
+          - name: ssa.sequifi.com
+            host: "54.176.226.49"
+            ssm_param: "/backend/ssa"
+            concurrency_group: "ssa-deployment"
+            
+          - name: demo.sequifi.com
+            host: "52.8.191.121"
+            ssm_param: "/backend/demo"
+            concurrency_group: "demo-deployment"
+
+          - name: mortgage.sequifi.com
+            host: "13.56.54.38"
+            ssm_param: "/backend/mortgage"
+            concurrency_group: "mortgage-deployment"
+ 
+          - name: mdm.sequifi.com
+            host: "52.53.75.81"
+            ssm_param: "/backend/mdm"
+            concurrency_group: "mdm-deployment"
+
+          - name: primepestslc.sequifi.com
+            host: "204.236.174.33"
+            ssm_param: "/backend/primepestslc"
+            concurrency_group: "primepestslc-deployment"
+
+          - name: primepestlubbock.sequifi.com
+            host: "13.52.13.195"
+            ssm_param: "/backend/primepestlubbock"
+            concurrency_group: "primepestlubbock-deployment"
+
+          - name: primepestnm.sequifi.com
+            host: "13.57.101.249"
+            ssm_param: "/backend/primepestnm"
+            concurrency_group: "primepestnm-deployment"
+
+          - name: primepesttucson.sequifi.com
+            host: "50.18.251.29"
+            ssm_param: "/backend/primepesttucson"
+            concurrency_group: "primepesttucson-deployment"
+
+          - name: primepestogden.sequifi.com
+            host: "13.56.145.130"
+            ssm_param: "/backend/primepestogden"
+            concurrency_group: "primepestogden-deployment"
+
+          - name: primepestaustin.sequifi.com
+            host: "52.8.169.166"
+            ssm_param: "/backend/primepestaustin"
+            concurrency_group: "primepestaustin-deployment"
+
+          - name: primepestok.sequifi.com
+            host: "13.52.26.121"
+            ssm_param: "/backend/primepestok"
+            concurrency_group: "primepestok-deployment"
+
+          - name: primepestsc.sequifi.com
+            host: "13.52.25.4"
+            ssm_param: "/backend/primepestsc"
+            concurrency_group: "primepestsc-deployment"
+            
+          - name: fortressroof.sequifi.com
+            host: "54.241.72.170"
+            ssm_param: "/backend/fortressroof"
+            concurrency_group: "fortressroof-deployment"
+             
+          - name: lendingspot.sequifi.com
+            host: "54.241.61.181"
+            ssm_param: "/backend/lendingspot"
+            concurrency_group: "lendingspot-deployment"
+            
+          - name: dovetailmortgage.sequifi.com
+            host: "52.8.36.92"
+            ssm_param: "/backend/dovetailmortgage"
+            concurrency_group: "dovetailmortgage-deployment"
+            
+          - name: sequipay.sequifi.com
+            host: "50.18.250.25"
+            ssm_param: "/backend/sequipay"
+            concurrency_group: "sequipay-deployment"
+
+
+    concurrency:
+      group: ${{ matrix.concurrency_group }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to ${{ matrix.name }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SEQUIFI_PROD_KEY }}
+          timeout: 60s
+          command_timeout: 30m
+          script: |
+            set -e
+
+            DEPLOY_PATH="/var/www/backend"
+            DEPLOY_DIR="${DEPLOY_PATH}/${{ github.run_number }}"
+            SSM_PARAM="${{ matrix.ssm_param }}"
+
+            echo "Starting Deployment #${{ github.run_number }} to ${{ matrix.name }}"
+            echo "Using SSM Parameter: $SSM_PARAM"
+
+            sudo rm -rf "${DEPLOY_DIR}" 2>/dev/null || true
+            sudo mkdir -p "${DEPLOY_DIR}"
+
+            sudo git clone --branch="${{ github.ref_name }}" \
+              "https://x-token-auth:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+              "${DEPLOY_DIR}"
+
+            sudo chown -R www-data:www-data "${DEPLOY_DIR}"
+            sudo chmod +x "${DEPLOY_DIR}/scripts/deploy.sh"
+
+            cd "${DEPLOY_DIR}"
+            
+            sudo bash scripts/deploy.sh "${{ github.run_number }}" "${{ github.ref_name }}" "${{ github.sha }}" "$SSM_PARAM"

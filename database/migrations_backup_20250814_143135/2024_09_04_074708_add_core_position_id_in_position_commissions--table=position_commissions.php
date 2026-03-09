@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        // Schema::table('position_commissions', function (Blueprint $table) {
+        //     $table->num('core_position_id')->nullable(); // Add the 'status' column of type string and nullable
+        // });
+        Schema::table('position_commissions', function (Blueprint $table) {
+            $table->unsignedBigInteger('core_position_id')->nullable()->after('position_id');
+
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('position_commissions', function (Blueprint $table) {
+            $table->dropColumn('core_position_id'); // Drop the 'status' column
+        });
+    }
+};

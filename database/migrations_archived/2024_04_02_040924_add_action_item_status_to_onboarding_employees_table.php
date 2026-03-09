@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('onboarding_employees', function (Blueprint $table) {
+            $table->tinyInteger('action_item_status')->default('0')->after('hired_by_uid')->comment('0 = Old, 1 = In Action Item');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('onboarding_employees', function (Blueprint $table) {
+            //
+        });
+    }
+};

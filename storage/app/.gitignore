@@ -1,0 +1,8 @@
+*
+!public/
+!.gitignore
+!processed_pdf/
+!processed_pdf/e_signed_pdf/
+!processed_pdf/form_data_merged_pdf/
+!signed_pdfs/
+!unsigned_pdfs/

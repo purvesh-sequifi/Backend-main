@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Override Pool System — Use Case Review Sheet</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12px;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      padding: 24px;
+    }
+
+    /* ── Header ── */
+    .doc-header {
+      background: linear-gradient(135deg, #1b3a6b 0%, #274d8a 100%);
+      color: #fff;
+      padding: 28px 36px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .doc-header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+    .doc-header h2 { font-size: 13px; font-weight: 400; opacity: 0.85; margin-top: 4px; }
+    .doc-meta { text-align: right; font-size: 11px; opacity: 0.8; line-height: 1.7; }
+    .doc-meta span { display: block; }
+
+    /* ── Parameter Box ── */
+    .params-box {
+      background: #fff;
+      border: 1px solid #d0d7e3;
+      padding: 18px 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .param-group h4 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6b7a99;
+      margin-bottom: 6px;
+      border-bottom: 2px solid #e8edf5;
+      padding-bottom: 4px;
+    }
+    .param-group p { font-size: 11.5px; line-height: 1.7; color: #2d3a52; }
+    .param-group p strong { color: #1b3a6b; }
+
+    /* ── Legend ── */
+    .legend {
+      background: #fff;
+      border: 1px solid #d0d7e3;
+      border-top: none;
+      padding: 10px 24px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .legend span { font-size: 10.5px; color: #6b7a99; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #3d4a63;
+    }
+    .legend-dot {
+      width: 14px; height: 14px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    /* ── Main Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      background: #fff;
+      border: 1px solid #d0d7e3;
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    /* Column widths */
+    col.c-uc    { width: 52px; }
+    col.c-calc  { width: 90px; }
+    col.c-dist  { width: 95px; }
+    col.c-form  { width: 130px; }
+    col.c-pool  { width: 68px; }
+    col.c-l1    { width: 80px; }
+    col.c-l2    { width: 80px; }
+    col.c-l3    { width: 80px; }
+    col.c-total { width: 72px; }
+    col.c-rem   { width: 72px; }
+    col.c-q     { width: 320px; }
+
+    thead tr th {
+      background: #1b3a6b;
+      color: #fff;
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-right: 1px solid #2e5196;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    thead tr.sub-header th {
+      background: #2c4f8a;
+      font-size: 9.5px;
+      padding: 6px 8px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    /* Group header rows */
+    tr.group-header td {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-right: none;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 9px 8px;
+      border-bottom: 1px solid #e8edf5;
+      border-right: 1px solid #e8edf5;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    td.uc-id {
+      font-weight: 700;
+      text-align: center;
+      font-size: 11px;
+      color: #fff;
+      vertical-align: middle;
+    }
+    td.formula-cell { font-family: 'Courier New', monospace; font-size: 10.5px; color: #2d3a52; }
+    td.amount-cell {
+      text-align: right;
+      font-weight: 700;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+    }
+    td.total-cell {
+      text-align: right;
+      font-weight: 700;
+      font-size: 12px;
+      background: #e8f0fe;
+      color: #1b3a6b;
+      font-family: 'Courier New', monospace;
+    }
+    td.remaining-cell {
+      text-align: right;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+    }
+    td.remaining-zero { color: #27ae60; font-weight: 700; }
+    td.remaining-warn { color: #e67e22; font-weight: 600; }
+    td.remaining-high { color: #e74c3c; font-weight: 700; }
+
+    /* Question cell */
+    td.questions-cell {
+      background: #fffef0;
+      border-left: 3px solid #f39c12;
+    }
+    td.questions-cell ol {
+      padding-left: 15px;
+      margin: 0;
+    }
+    td.questions-cell ol li {
+      font-size: 10.5px;
+      color: #4a3800;
+      line-height: 1.55;
+      margin-bottom: 5px;
+      padding-right: 4px;
+    }
+    td.questions-cell ol li:last-child { margin-bottom: 0; }
+    .q-label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #b8860b;
+      margin-bottom: 4px;
+    }
+
+    /* Calc type colour bands */
+    .row-fixed    td.uc-id { background: #2e6da4; }
+    .row-gav      td.uc-id { background: #2e8b57; }
+    .row-xminus   td.uc-id { background: #d35400; }
+    .row-volume   td.uc-id { background: #6c3483; }
+
+    tr.group-header.group-fixed   { background: #dce8f6; color: #1b3a6b; border-left: 5px solid #2e6da4; }
+    tr.group-header.group-gav     { background: #d4edda; color: #145a32; border-left: 5px solid #2e8b57; }
+    tr.group-header.group-xminus  { background: #fde9d9; color: #78280c; border-left: 5px solid #d35400; }
+    tr.group-header.group-volume  { background: #e8d5f5; color: #3b1a5e; border-left: 5px solid #6c3483; }
+
+    tr.row-fixed:hover,
+    tr.row-gav:hover,
+    tr.row-xminus:hover,
+    tr.row-volume:hover { filter: brightness(0.97); }
+
+    /* Distribution mode badge */
+    .dist-badge {
+      display: inline-block;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .badge-fixed  { background: #e3f0ff; color: #1b3a6b; }
+    .badge-mlm    { background: #fff0e3; color: #b84000; }
+    .badge-gap    { background: #f0e3ff; color: #5b1a8a; }
+
+    /* Edge-case row */
+    tr.edge-case td {
+      background: #fff3f3;
+      font-size: 10.5px;
+      color: #7b1a1a;
+      font-style: italic;
+    }
+    tr.edge-case td.uc-id { background: #c0392b; font-style: normal; font-size: 10px; }
+
+    /* ── Summary Table ── */
+    .summary-section {
+      margin-top: 28px;
+    }
+    .summary-section h3 {
+      background: #1b3a6b;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 13px;
+      border-radius: 8px 8px 0 0;
+    }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid #d0d7e3;
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+    }
+    .summary-table th {
+      background: #2c4f8a;
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-align: center;
+    }
+    .summary-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e8edf5;
+      font-size: 11.5px;
+      text-align: center;
+    }
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table tr.best { background: #eaffea; font-weight: 600; }
+    .summary-table tr.worst { background: #fff5f5; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 24px;
+      background: #fff;
+      border: 1px solid #d0d7e3;
+      border-radius: 8px;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #6b7a99;
+    }
+    .footer strong { color: #1b3a6b; }
+    .status-badge {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+      border-radius: 12px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    @media print {
+      body { padding: 10px; background: white; }
+      .table-wrap { overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<div class="doc-header">
+  <div>
+    <h1>SEQUIFI — Override Pool System</h1>
+    <h2>Use Case Review Sheet &nbsp;·&nbsp; All 12 Calculation × Distribution Combinations</h2>
+  </div>
+  <div class="doc-meta">
+    <span><strong>Document Version:</strong> 1.0</span>
+    <span><strong>PRD Reference:</strong> Override Pool PRD v2.0</span>
+    <span><strong>Prepared By:</strong> Engineering Team</span>
+    <span><strong>Date:</strong> March 2026</span>
+    <span><strong>Status:</strong> <span class="status-badge">Awaiting Product Owner Review</span></span>
+  </div>
+</div>
+
+<!-- ══════════════ PARAMETERS ══════════════ -->
+<div class="params-box">
+  <div class="param-group">
+    <h4>Sale Parameters</h4>
+    <p><strong>GAV:</strong> $10,000</p>
+    <p><strong>Rep Commission:</strong> $200</p>
+    <p><strong>X value (X-Minus):</strong> $800</p>
+  </div>
+  <div class="param-group">
+    <h4>Pool Config</h4>
+    <p><strong>Fixed pool_value:</strong> $600</p>
+    <p><strong>% of GAV pool_pct:</strong> 6%</p>
+    <p><strong>Vol-Tier pool/sale:</strong> $50</p>
+    <p><strong>Quarterly sales:</strong> 300</p>
+  </div>
+  <div class="param-group">
+    <h4>Distribution Rates</h4>
+    <p><strong>Fixed % →</strong> L1=50%, L2=30%, L3=20%</p>
+    <p><strong>MLM →</strong> L1 takes 50%, L2 takes 40% of rem, L3 takes 30% of rem</p>
+  </div>
+  <div class="param-group">
+    <h4>Gap-Fill Tier%</h4>
+    <p><strong>L1 downline:</strong> 300 sales → 10%</p>
+    <p><strong>L2 downline:</strong> 800 sales → 22%</p>
+    <p><strong>L3 downline:</strong> 1,500 sales → 35%</p>
+    <p style="margin-top:4px;font-size:10px;color:#888">Chain: Seller → L1 → L2 → L3</p>
+  </div>
+</div>
+
+<!-- ══════════════ LEGEND ══════════════ -->
+<div class="legend">
+  <span>Legend:</span>
+  <div class="legend-item"><span class="legend-dot" style="background:#2e6da4"></span> Fixed Calc Type</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#2e8b57"></span> % of GAV Calc Type</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#d35400"></span> X-Minus Calc Type</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#6c3483"></span> Volume-Based Tier</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#fffef0;border:1px solid #f39c12"></span> Questions for Product Owner</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#fff3f3;border:1px solid #e74c3c"></span> Edge Case Row</div>
+</div>
+
+<!-- ══════════════ MAIN TABLE ══════════════ -->
+<div class="table-wrap">
+<table>
+  <colgroup>
+    <col class="c-uc"/>
+    <col class="c-calc"/>
+    <col class="c-dist"/>
+    <col class="c-form"/>
+    <col class="c-pool"/>
+    <col class="c-l1"/>
+    <col class="c-l2"/>
+    <col class="c-l3"/>
+    <col class="c-total"/>
+    <col class="c-rem"/>
+    <col class="c-q"/>
+  </colgroup>
+  <thead>
+    <tr>
+      <th>UC ID</th>
+      <th>Calc Type</th>
+      <th>Distribution Mode</th>
+      <th>Pool Formula</th>
+      <th>Pool Amount</th>
+      <th>L1 Amount</th>
+      <th>L2 Amount</th>
+      <th>L3 Amount</th>
+      <th>Total Paid</th>
+      <th>Remaining</th>
+      <th>❓ Questions for Product Owner</th>
+    </tr>
+    <tr class="sub-header">
+      <th></th>
+      <th>How pool is computed</th>
+      <th>How pool is split</th>
+      <th>Exact formula used</th>
+      <th>Computed pool</th>
+      <th>Direct recruiter</th>
+      <th>L1's recruiter</th>
+      <th>L2's recruiter</th>
+      <th>Sum distributed</th>
+      <th>Undistributed</th>
+      <th>Open questions requiring clarification before implementation</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- ══ GROUP 1: FIXED ══ -->
+    <tr class="group-header group-fixed">
+      <td colspan="11">
+        🔵 &nbsp; CALC TYPE 1: FIXED POOL &nbsp;—&nbsp;
+        Pool = pool_value (constant $600, independent of GAV or commission)
+      </td>
+    </tr>
+
+    <!-- UC-F1 -->
+    <tr class="row-fixed">
+      <td class="uc-id">UC-F1</td>
+      <td>Fixed Pool</td>
+      <td><span class="dist-badge badge-fixed">Fixed %</span></td>
+      <td class="formula-cell">pool = $600<br/>L1 = 50% × $600<br/>L2 = 30% × $600<br/>L3 = 20% × $600</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$300.00</td>
+      <td class="amount-cell">$180.00</td>
+      <td class="amount-cell">$120.00</td>
+      <td class="total-cell">$600.00</td>
+      <td class="remaining-cell remaining-zero">$0.00 ✓</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>Is the $600 fixed value locked permanently per position/product or reviewed periodically? Who has authority to change it?</li>
+          <li>If a user in the chain is <strong>terminated</strong>, should their level's 30% be <strong>redistributed upward/downward</strong>, or is it simply forfeited?</li>
+          <li>Should the system <strong>warn the admin</strong> if level percentages don't sum to exactly 100% (e.g., only 90% configured), leaving an unintentional $60 undistributed?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- UC-F2 -->
+    <tr class="row-fixed">
+      <td class="uc-id">UC-F2</td>
+      <td>Fixed Pool</td>
+      <td><span class="dist-badge badge-mlm">MLM Remaining</span></td>
+      <td class="formula-cell">pool = $600<br/>L1 = 50% × $600<br/>L2 = 40% × $300<br/>L3 = 30% × $180</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$300.00</td>
+      <td class="amount-cell">$120.00</td>
+      <td class="amount-cell">$54.00</td>
+      <td class="total-cell">$474.00</td>
+      <td class="remaining-cell remaining-warn">$126.00 ⚠</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li><strong>What happens to the $126 undistributed amount?</strong> Options: (a) retained by company, (b) rolls over to next period, (c) redistributed to L1 — please confirm business rule.</li>
+          <li>If the L3 position is <strong>vacant</strong> (no user configured), does the $54 cascade further down or stop and become part of the remainder?</li>
+         </ol>
+      </td>
+    </tr>
+
+    <!-- UC-F3 -->
+    <tr class="row-fixed">
+      <td class="uc-id">UC-F3</td>
+      <td>Fixed Pool</td>
+      <td><span class="dist-badge badge-gap">Gap-Fill</span></td>
+      <td class="formula-cell">pool_val = $600/sale<br/>L1 = 10% × $600<br/>L2 = 22%−10% = 12% × $600<br/>L3 = 35%−22% = 13% × $600</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$60.00</td>
+      <td class="amount-cell">$72.00</td>
+      <td class="amount-cell">$78.00</td>
+      <td class="total-cell">$210.00</td>
+      <td class="remaining-cell remaining-high">$390.00 🔴</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li><strong>$390 (65% of pool) is undistributed</strong> with only 3 levels — is this acceptable? Should the admin be warned that the pool_value ($600) is much larger than what gap-fill will distribute?</li>
+          <li>Gap-Fill requires tier% per user — <strong>who defines these tier percentages when calc type is Fixed</strong> (not Volume-Tier)? Is a separate tier table still required?</li>
+          <li>Should the system <strong>block saving</strong> a Fixed + Gap-Fill config if no tier table is provided, since distribution depends on tier%?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- ══ GROUP 2: % OF GAV ══ -->
+    <tr class="group-header group-gav">
+      <td colspan="11">
+        🟢 &nbsp; CALC TYPE 2: PERCENTAGE OF GAV &nbsp;—&nbsp;
+        Pool = GAV × pool_pct = $10,000 × 6% = $600 &nbsp;(scales dynamically with deal size)
+      </td>
+    </tr>
+
+    <!-- UC-G1 -->
+    <tr class="row-gav">
+      <td class="uc-id">UC-G1</td>
+      <td>% of GAV</td>
+      <td><span class="dist-badge badge-fixed">Fixed %</span></td>
+      <td class="formula-cell">pool = $10,000 × 6%<br/>L1 = 50% × $600<br/>L2 = 30% × $600<br/>L3 = 20% × $600</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$300.00</td>
+      <td class="amount-cell">$180.00</td>
+      <td class="amount-cell">$120.00</td>
+      <td class="total-cell">$600.00</td>
+      <td class="remaining-cell remaining-zero">$0.00 ✓</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>If a sale is <strong>reversed or cancelled after commission is paid</strong>, should pool overrides be automatically clawed back, or is it a manual adjustment?</li>
+          <li>Should there be a <strong>cap on the pool amount</strong> (e.g., max $2,000 regardless of GAV) to prevent over-payment on unusually large deals?</li>
+       </ol>
+      </td>
+    </tr>
+
+    <!-- UC-G2 -->
+    <tr class="row-gav">
+      <td class="uc-id">UC-G2</td>
+      <td>% of GAV</td>
+      <td><span class="dist-badge badge-mlm">MLM Remaining</span></td>
+      <td class="formula-cell">pool = $10,000 × 6%<br/>L1 = 50% × $600<br/>L2 = 40% × $300<br/>L3 = 30% × $180</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$300.00</td>
+      <td class="amount-cell">$120.00</td>
+      <td class="amount-cell">$54.00</td>
+      <td class="total-cell">$474.00</td>
+      <td class="remaining-cell remaining-warn">$126.00 ⚠</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>If GAV is <strong>adjusted post-calculation</strong> (partial chargeback, $10,000 → $7,000), how are already-written override records corrected — reversal + rewrite, or delta record?</li>
+          <li>Are the MLM cascade rates (40% of rem, 30% of rem) <strong>configurable per level</strong>, or are they fixed system-wide? Can admin set Level 2 to 60% of remainder?</li>
+          <li>Same as UC-F2: <strong>What is the approved business rule for the $126 remainder?</strong></li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- UC-G3 -->
+    <tr class="row-gav">
+      <td class="uc-id">UC-G3</td>
+      <td>% of GAV</td>
+      <td><span class="dist-badge badge-gap">Gap-Fill</span></td>
+      <td class="formula-cell">pool_val = $10,000 × 6%<br/>L1 = 10% × $600<br/>L2 = 22%-10% = 12% × $600<br/>L3 = 35%-12% = 13% × $600</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$60.00</td>
+      <td class="amount-cell">$72.00</td>
+      <td class="amount-cell">$78.00</td>
+      <td class="total-cell">$210.00</td>
+      <td class="remaining-cell remaining-high">$390.00 🔴</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>If <strong>GAV = $0</strong> (full sale reversal), pool = $0 — should the system create a <strong>negative/reversal override record</strong> to claw back previously distributed amounts?</li>
+          <li>What if two users in the chain have the <strong>same tier%</strong> (gap = 0%) — is a $0 override record created, or is that level silently skipped?</li>
+          <li>Should the <strong>pool_pct (6%) apply to adjusted or gross GAV</strong> when there are dealer fees, installation costs, or rebates involved?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- ══ GROUP 3: X-MINUS ══ -->
+    <tr class="group-header group-xminus">
+      <td colspan="11">
+        🟠 &nbsp; CALC TYPE 3: X-MINUS-COMMISSION &nbsp;—&nbsp;
+        Pool = max(0, X − rep_commission) = max(0, $800 − $200) = $600 &nbsp;|&nbsp; Pool collapses to $0 if rep over-earns
+      </td>
+    </tr>
+
+    <!-- UC-X1 -->
+    <tr class="row-xminus">
+      <td class="uc-id">UC-X1</td>
+      <td>X-Minus</td>
+      <td><span class="dist-badge badge-fixed">Fixed %</span></td>
+      <td class="formula-cell">pool = max(0, $800−$200)<br/>L1 = 50% × $600<br/>L2 = 30% × $600<br/>L3 = 20% × $600</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$300.00</td>
+      <td class="amount-cell">$180.00</td>
+      <td class="amount-cell">$120.00</td>
+      <td class="total-cell">$600.00</td>
+      <td class="remaining-cell remaining-zero">$0.00 ✓</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>When pool = $0 because rep over-earned, should this be a <strong>reportable event</strong> visible in admin reports, or silently skipped?</li>
+          <li>Is the X value ($800) <strong>the same for all reps</strong> at this position, or should it be configurable per rep seniority or plan tier?</li>
+          <li>Should the system <strong>alert admin when X is consistently below rep commissions</strong> across multiple sales, indicating a possible misconfiguration?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- Edge Case Row for X-Minus -->
+    <tr class="edge-case">
+      <td class="uc-id" style="font-size:9px;">UC-X1<br/>EDGE</td>
+      <td>X-Minus</td>
+      <td><span class="dist-badge badge-fixed">Fixed %</span></td>
+      <td class="formula-cell">pool = max(0, $800−$900)<br/>= max(0, −$100) = $0</td>
+      <td class="amount-cell" style="color:#c0392b;">$0.00</td>
+      <td class="amount-cell" style="color:#c0392b;">$0.00</td>
+      <td class="amount-cell" style="color:#c0392b;">$0.00</td>
+      <td class="amount-cell" style="color:#c0392b;">$0.00</td>
+      <td class="total-cell" style="color:#c0392b;background:#fff0f0;">$0.00</td>
+      <td class="remaining-cell" style="color:#c0392b;">$0.00</td>
+      <td class="questions-cell" style="background:#fff0f0;">
+        <span class="q-label" style="color:#c0392b;">Edge Case — rep commission ($900) exceeds X ($800)</span>
+        <ol>
+          <li>No override records written. Is this <strong>logged in the batch log</strong> as a skipped sale, so admin can audit why L1/L2/L3 received nothing?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- UC-X2 -->
+    <tr class="row-xminus">
+      <td class="uc-id">UC-X2</td>
+      <td>X-Minus</td>
+      <td><span class="dist-badge badge-mlm">MLM Remaining</span></td>
+      <td class="formula-cell">pool = max(0, $800−$200)<br/>L1 = 50% × $600<br/>L2 = 40% × $300<br/>L3 = 30% × $180</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$300.00</td>
+      <td class="amount-cell">$120.00</td>
+      <td class="amount-cell">$54.00</td>
+      <td class="total-cell">$474.00</td>
+      <td class="remaining-cell remaining-warn">$126.00 ⚠</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>When pool = $0 (rep over-earns), the <strong>entire MLM cascade produces nothing</strong> — should admins receive a proactive alert during payroll review rather than discovering it post-run?</li>
+          <li>Can the X value be <strong>dynamic</strong> (e.g., X = GAV × 10%) rather than a fixed dollar amount, to scale with deal size?</li>
+          <li>For <strong>quarterly payout triggers</strong>, is X-Minus applied per individual sale, or against total quarter commission vs. total quarter X budget?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- UC-X3 -->
+    <tr class="row-xminus">
+      <td class="uc-id">UC-X3</td>
+      <td>X-Minus</td>
+      <td><span class="dist-badge badge-gap">Gap-Fill</span></td>
+      <td class="formula-cell">pool_val = max(0,$800−$200)<br/>L1 = 10% × $600<br/>L2 22%-10% = 12% × $600<br/>L3 = 35%-22% = 13% × $600</td>
+      <td class="amount-cell">$600.00</td>
+      <td class="amount-cell">$60.00</td>
+      <td class="amount-cell">$72.00</td>
+      <td class="amount-cell">$78.00</td>
+      <td class="total-cell">$210.00</td>
+      <td class="remaining-cell remaining-high">$390.00 🔴</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>Gap-Fill already leaves 65% undistributed ($390). If X-Minus <strong>further reduces the pool</strong> (e.g., pool = $100), should the simulation tool <strong>prominently flag the compounding impact</strong> before admin commits?</li>
+          <li>Is it valid business logic to combine <strong>X-Minus (commission-driven)</strong> with <strong>Gap-Fill (tier-driven)</strong>? Should this combination require an explicit admin confirmation step?</li>
+          <li>Should there be a <strong>minimum gap-fill payout floor</strong> (e.g., $5 minimum per level) to avoid writing $3–$4 override records that add bookkeeping noise?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- ══ GROUP 4: VOLUME-TIER ══ -->
+    <tr class="group-header group-volume">
+      <td colspan="11">
+        🟣 &nbsp; CALC TYPE 4: VOLUME-BASED TIER — QUARTERLY BATCH &nbsp;—&nbsp;
+        Pool = 300 sales × $50/sale = $15,000 total &nbsp;|&nbsp; Each user's % determined by their own downline volume via tier lookup
+      </td>
+    </tr>
+
+    <!-- UC-V1 -->
+    <tr class="row-volume">
+      <td class="uc-id">UC-V1</td>
+      <td>Volume-Tier</td>
+      <td><span class="dist-badge badge-fixed">Fixed %</span></td>
+      <td class="formula-cell">pool = 300 × $50 = $15,000<br/>L1 = 50% × $15,000<br/>L2 = 30% × $15,000<br/>L3 = 20% × $15,000</td>
+      <td class="amount-cell">$15,000.00</td>
+      <td class="amount-cell">$7,500.00</td>
+      <td class="amount-cell">$4,500.00</td>
+      <td class="amount-cell">$3,000.00</td>
+      <td class="total-cell">$15,000.00</td>
+      <td class="remaining-cell remaining-zero">$0.00 ✓</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li>In this mode, <strong>individual tier% (10%, 22%, 35%) is not used</strong> for distribution — the fixed level% overrides it. Should the UI <strong>explicitly warn the admin</strong> that tier percentages are ignored when Fixed % distribution is selected alongside Volume-Tier calc?</li>
+          <li>If a <strong>new rep joins mid-quarter</strong> with 0 downline, do they immediately affect their upline's downline count (and thus tier%)? Or is the downline snapshot taken at quarter-end?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- UC-V2 -->
+    <tr class="row-volume">
+      <td class="uc-id">UC-V2</td>
+      <td>Volume-Tier</td>
+      <td><span class="dist-badge badge-mlm">MLM Remaining</span></td>
+      <td class="formula-cell">pool = 300 × $50 = $15,000<br/>L1 = 50% × $15,000<br/>L2 = 40% × $7,500<br/>L3 = 30% × $4,500</td>
+      <td class="amount-cell">$15,000.00</td>
+      <td class="amount-cell">$7,500.00</td>
+      <td class="amount-cell">$3,000.00</td>
+      <td class="amount-cell">$1,350.00</td>
+      <td class="total-cell">$11,850.00</td>
+      <td class="remaining-cell remaining-high">$3,150.00 🔴</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions</span>
+        <ol>
+          <li><strong>$3,150 undistributed (21% of $15,000)</strong> — at quarterly scale this is a significant amount per customer. What is the <strong>approved business rule</strong> for this remainder? This must be confirmed before go-live.</li>
+          <li>If <strong>L1 is terminated when the quarterly batch runs</strong>, does their $7,500 cascade down to L2, revert to company, or require manual handling?</li>
+          <li>Can MLM cascade percentages (50% / 40% / 30%) be <strong>customized per pool configuration</strong>, or are they fixed globally in the system?</li>
+        </ol>
+      </td>
+    </tr>
+
+    <!-- UC-V3 — Grow Marketing Model -->
+    <tr class="row-volume">
+      <td class="uc-id" style="background:#4a235a;">UC-V3<br/><span style="font-size:8px;font-weight:400;">Grow Mktg</span></td>
+      <td>Volume-Tier</td>
+      <td><span class="dist-badge badge-gap">Gap-Fill</span></td>
+      <td class="formula-cell">300 × $50 = $15,000<br/>L1: 300×$50×10% = $1,500<br/>L2: 300×$50×12%gap = $1,800<br/>L3: 300×$50×13%gap = $1,950</td>
+      <td class="amount-cell">$15,000.00</td>
+      <td class="amount-cell">$1,500.00</td>
+      <td class="amount-cell">$1,800.00</td>
+      <td class="amount-cell">$1,950.00</td>
+      <td class="total-cell">$5,250.00</td>
+      <td class="remaining-cell remaining-high">$9,750.00 🔴</td>
+      <td class="questions-cell">
+        <span class="q-label">Questions — Critical (Grow Marketing Validation Customer)</span>
+        <ol>
+          <li><strong>$9,750 (65% of $15,000) remains undistributed</strong> with 3 levels. Is Grow Marketing aware that only 35% of the total pool pot is distributed? Is this their <strong>intended design confirmed in their spreadsheet</strong>, or does their model distribute more?</li>
+          <li>Are tier percentages <strong>calculated at quarter-end</strong> (using final downline counts) or <strong>locked at quarter-start</strong>? If a user crosses a tier boundary mid-quarter (e.g., 499→500 sales), do they get the higher rate for the <strong>full quarter or only from the crossing date</strong>?</li>
+          <li>If Grow Marketing adds an <strong>L4 or L5 user</strong> to the chain in future, will the system automatically pick up the additional tier differential without configuration changes — or does max_depth need to be manually updated?</li>
+        </ol>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+
+<!-- ══════════════ SUMMARY ══════════════ -->
+<div class="summary-section">
+  <h3>📊 Distribution Efficiency Summary — All 12 Combinations</h3>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>UC ID</th>
+        <th>Calc Type</th>
+        <th>Distribution Mode</th>
+        <th>Pool Amount</th>
+        <th>L1</th>
+        <th>L2</th>
+        <th>L3</th>
+        <th>Total Distributed</th>
+        <th>Remaining</th>
+        <th>Efficiency %</th>
+        <th>Key Risk</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="best">
+        <td>UC-F1</td><td>Fixed</td><td>Fixed %</td><td>$600</td><td>$300</td><td>$180</td><td>$120</td><td>$600.00</td><td>$0.00</td><td>100% ✓</td><td>None — full distribution</td>
+      </tr>
+      <tr>
+        <td>UC-F2</td><td>Fixed</td><td>MLM Remaining</td><td>$600</td><td>$300</td><td>$120</td><td>$54</td><td>$474.00</td><td>$126.00</td><td>79%</td><td>$126 remainder fate undefined</td>
+      </tr>
+      <tr class="worst">
+        <td>UC-F3</td><td>Fixed</td><td>Gap-Fill</td><td>$600</td><td>$60</td><td>$72</td><td>$78</td><td>$210.00</td><td>$390.00</td><td>35%</td><td>65% undistributed — large waste</td>
+      </tr>
+      <tr class="best">
+        <td>UC-G1</td><td>% of GAV</td><td>Fixed %</td><td>$600</td><td>$300</td><td>$180</td><td>$120</td><td>$600.00</td><td>$0.00</td><td>100% ✓</td><td>Clawback on reversal not defined</td>
+      </tr>
+      <tr>
+        <td>UC-G2</td><td>% of GAV</td><td>MLM Remaining</td><td>$600</td><td>$300</td><td>$120</td><td>$54</td><td>$474.00</td><td>$126.00</td><td>79%</td><td>GAV adjustment handling undefined</td>
+      </tr>
+      <tr class="worst">
+        <td>UC-G3</td><td>% of GAV</td><td>Gap-Fill</td><td>$600</td><td>$60</td><td>$72</td><td>$78</td><td>$210.00</td><td>$390.00</td><td>35%</td><td>65% undistributed</td>
+      </tr>
+      <tr class="best">
+        <td>UC-X1</td><td>X-Minus</td><td>Fixed %</td><td>$600</td><td>$300</td><td>$180</td><td>$120</td><td>$600.00</td><td>$0.00</td><td>100% ✓</td><td>Pool collapses to $0 if rep over-earns</td>
+      </tr>
+      <tr>
+        <td>UC-X2</td><td>X-Minus</td><td>MLM Remaining</td><td>$600</td><td>$300</td><td>$120</td><td>$54</td><td>$474.00</td><td>$126.00</td><td>79%</td><td>Entire cascade = $0 when rep over-earns</td>
+      </tr>
+      <tr class="worst">
+        <td>UC-X3</td><td>X-Minus</td><td>Gap-Fill</td><td>$600</td><td>$60</td><td>$72</td><td>$78</td><td>$210.00</td><td>$390.00</td><td>35%</td><td>Double risk: X-Minus + 65% undistributed</td>
+      </tr>
+      <tr class="best">
+        <td>UC-V1</td><td>Volume-Tier</td><td>Fixed %</td><td>$15,000</td><td>$7,500</td><td>$4,500</td><td>$3,000</td><td>$15,000.00</td><td>$0.00</td><td>100% ✓</td><td>Tier% ignored in this mode</td>
+      </tr>
+      <tr>
+        <td>UC-V2</td><td>Volume-Tier</td><td>MLM Remaining</td><td>$15,000</td><td>$7,500</td><td>$3,000</td><td>$1,350</td><td>$11,850.00</td><td>$3,150.00</td><td>79%</td><td>$3,150 remainder at scale is material</td>
+      </tr>
+      <tr class="worst">
+        <td>UC-V3</td><td>Volume-Tier</td><td>Gap-Fill</td><td>$15,000</td><td>$1,500</td><td>$1,800</td><td>$1,950</td><td>$5,250.00</td><td>$9,750.00</td><td>35%</td><td>$9,750 undistributed — confirm with Grow Mktg</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════ OPEN ITEMS ══════════════ -->
+<div class="summary-section">
+  <h3>🚨 Critical Open Items — Requires Product Owner Decision Before Implementation</h3>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Issue</th>
+        <th>Affects</th>
+        <th>Impact if Unresolved</th>
+        <th>Requested Decision</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="worst">
+        <td>1</td>
+        <td><strong>Undistributed pool remainder rule</strong> — MLM and Gap-Fill leave 21%–65% undistributed with 3 levels</td>
+        <td>UC-F2, G2, X2, X3, V2, V3, F3, G3</td>
+        <td>Revenue leakage or over-payment depending on rule chosen</td>
+        <td>Retain by company / roll over / redistribute to L1?</td>
+      </tr>
+      <tr class="worst">
+        <td>2</td>
+        <td><strong>Grow Marketing 65% undistributed</strong> — UC-V3 only distributes 35% of $15,000 = $5,250</td>
+        <td>UC-V3 (Grow Marketing)</td>
+        <td>Customer validation may fail parallel run — blocks go-live</td>
+        <td>Confirm with Grow Marketing that 35% distribution is correct</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><strong>Tier% source for non-Volume-Tier gap-fill configs</strong> (Fixed, GAV, X-Minus + Gap-Fill)</td>
+        <td>UC-F3, G3, X3</td>
+        <td>System cannot compute gap-fill without tier% — will error at runtime</td>
+        <td>Must a tier table always be configured when Gap-Fill mode is selected?</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><strong>Sale reversal / clawback handling</strong> for % of GAV configs</td>
+        <td>UC-G1, G2, G3</td>
+        <td>Overrides stay on record after sale reversal — incorrect payroll</td>
+        <td>Auto-reverse override records on GAV adjustment, or manual process?</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><strong>Terminated user in chain</strong> — current PRD says skip level, but percentage is forfeited</td>
+        <td>All 12 UCs</td>
+        <td>Chain members above terminated user may receive less than configured</td>
+        <td>Redistribute forfeited % upward, or is forfeit the intended behavior?</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><strong>Quarterly batch idempotency</strong> — double-run risk for Volume-Tier quarterly configs</td>
+        <td>UC-V1, V2, V3</td>
+        <td>Double-writes $15,000 in overrides if batch triggered twice</td>
+        <td>Add unique constraint on (sale_id, user_id, period, overrides_type='pool')?</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<div class="footer">
+  <div>
+    <strong>Sequifi — Override Pool System</strong> &nbsp;·&nbsp;
+    Use Case Review Sheet v1.0 &nbsp;·&nbsp;
+    PRD Reference: Override Pool PRD v2.0 (February 2026)
+  </div>
+  <div style="text-align:right">
+    <strong>Total Combinations:</strong> 12 &nbsp;|&nbsp;
+    <strong>Open Questions:</strong> 36 &nbsp;|&nbsp;
+    <strong>Critical Items:</strong> 6 &nbsp;|&nbsp;
+    <em>Please annotate questions and return for engineering review</em>
+  </div>
+</div>
+
+</body>
+</html>

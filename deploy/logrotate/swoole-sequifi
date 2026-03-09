@@ -1,0 +1,29 @@
+/var/www/backend/storage/logs/swoole*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    missingok
+    create 0640 www-data www-data
+    sharedscripts
+    postrotate
+        /usr/bin/supervisorctl signal USR1 sequifi-octane:* > /dev/null 2>&1 || true
+    endscript
+}
+
+/var/www/backend/storage/logs/octane-stdout.log
+/var/www/backend/storage/logs/octane-stderr.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    missingok
+    create 0640 www-data www-data
+    sharedscripts
+    postrotate
+        /usr/bin/supervisorctl restart sequifi-octane:* > /dev/null 2>&1 || true
+    endscript
+}
+

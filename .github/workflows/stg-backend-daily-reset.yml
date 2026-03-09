@@ -1,0 +1,32 @@
+name: Reset STG-Backend Daily (9 AM IST)
+
+on:
+    schedule:
+        - cron: '30 3 * * *' # 9:00 AM IST
+    workflow_dispatch: {}
+
+permissions:
+    contents: write
+
+jobs:
+    reset-stg:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Configure Git
+              run: |
+                  git config --global user.name "GitHub Actions Bot"
+                  git config --global user.email "actions@github.com"
+
+            - name: Force Reset STG-Backend to Main
+              run: |
+                  echo "🔄 Resetting STG-Backend to match main"
+                  git checkout STG-Backend || git checkout -b STG-Backend
+                  git fetch origin main
+                  git reset --hard origin/main
+                  git push origin STG-Backend --force
+                  echo "✅ STG-Backend reset complete at $(date)"

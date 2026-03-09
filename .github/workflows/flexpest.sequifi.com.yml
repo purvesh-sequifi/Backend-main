@@ -1,0 +1,254 @@
+name: Deploy on Flexpest Server
+
+on:
+  push:
+    branches:
+      - flexpest-backend
+
+env:
+  DEPLOY_USER: "ubuntu"
+  DEPLOY_PATH: "/var/www/backend"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        include:
+        
+          - name: flexpest
+            host:  "184.72.56.15"
+            ssm_param: "/backend/flexpest"
+            
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Pre-deployment Setup
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            DEPLOY_PATH="/var/www/backend"
+            DEPLOY_DIR="${DEPLOY_PATH}/${{ github.run_number }}"
+            CURRENT_LINK="${DEPLOY_PATH}/current"
+            
+            # Run cleanup script if it exists
+            sudo bash ${DEPLOY_PATH}/cleanup.sh || echo "Cleanup script not found or failed, continuing..."
+            
+            # Create deploy directory and clone repository
+            sudo mkdir -p "${DEPLOY_DIR}" && cd "${DEPLOY_DIR}"
+            CURRENT_RUN=${{ github.run_number }}
+            PREVIOUS_RUN=$((CURRENT_RUN - 1))
+            
+            echo "======================================="
+            echo "Cleaning up old deployments..."
+            echo "Keeping deployments: ${CURRENT_RUN} and ${PREVIOUS_RUN}"
+            echo "======================================="
+            cd "${DEPLOY_PATH}"
+            
+            # Clean up all numeric folders except current and previous run
+            for dir in $(ls -1d [0-9]* 2>/dev/null); do
+              if [[ "$dir" =~ ^[0-9]+$ ]]; then
+                if [ "$dir" -ne "$CURRENT_RUN" ] && [ "$dir" -ne "$PREVIOUS_RUN" ]; then
+                  echo "Removing old deployment: $dir"
+                  sudo rm -rf "${DEPLOY_PATH}/$dir"
+                else
+                  echo "Keeping deployment: $dir"
+                fi
+              fi
+            done
+            
+            sudo git clone --branch="${{ github.ref_name }}" \
+              "https://x-token-auth:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+              "${DEPLOY_DIR}"
+
+            # Remove existing Kernel.php if it exists
+            sudo rm -f "${DEPLOY_DIR}/app/Console/Kernel.php"
+            # Copy new Kernel.php file into that path
+            sudo cp /home/ubuntu/workspace/Kernel/Kernel.php "${DEPLOY_DIR}/app/Console/Kernel.php"
+
+            # Set proper permissions
+            sudo chown -R www-data:www-data "${DEPLOY_DIR}"
+            sudo chmod -R 755 "${DEPLOY_DIR}"
+            
+            # Fetch SSM parameter
+            SSM_PARAM="${{ matrix.ssm_param }}"
+            echo "Fetching SSM param: $SSM_PARAM"
+            sudo aws ssm get-parameter --name "$SSM_PARAM" --with-decryption --output text --query Parameter.Value | sudo tee "${DEPLOY_DIR}/.env" > /dev/null
+            sudo chmod 644 "${DEPLOY_DIR}/.env"
+            sudo chown www-data:www-data "${DEPLOY_DIR}/.env"
+            
+            # Update symlink
+            sudo unlink "${CURRENT_LINK}" || true
+            sudo ln -s "${DEPLOY_DIR}" "${CURRENT_LINK}"
+
+      - name: Setup Application Environment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            CURRENT_LINK="/var/www/backend/current"
+            
+            # Create required directories including Laravel framework cache
+            for DIR in \
+              storage/app/processed_pdf/e_signed_pdf \
+              storage/app/processed_pdf/form_data_merged_pdf \
+              storage/app/signed_pdfs \
+              storage/app/unsigned_pdfs \
+              storage/logs \
+              storage/app/temp/fieldroutes \
+              storage/framework/cache/data \
+              storage/framework/sessions \
+              storage/framework/views \
+              storage/framework/testing \
+              public/jobs_queue
+            do
+              sudo mkdir -p "${CURRENT_LINK}/${DIR}"
+            done
+            
+            # Set proper permissions on storage
+            sudo chown -R www-data:www-data "${CURRENT_LINK}/storage"
+            sudo find "${CURRENT_LINK}/storage" -type d -exec chmod 777 {} \;
+            sudo find "${CURRENT_LINK}/storage" -type f -exec chmod 777 {} \;
+            
+            # Ensure Laravel framework cache directories have proper permissions
+            sudo chmod -R 777 "${CURRENT_LINK}/storage/framework"
+            sudo chown -R www-data:www-data "${CURRENT_LINK}/storage/framework"
+            
+            # Pre-create cache subdirs for lockable file fix
+            for h in {0..9} {a..f}; do for h2 in {0..9} {a..f}; do sudo mkdir -p "${CURRENT_LINK}/storage/framework/cache/data/${h}${h2}" 2>/dev/null || true; done; done
+            
+            # Setup cache directories
+            sudo mkdir -p /var/www/.config/psysh /var/www/.cache/composer/files
+            sudo chown -R www-data:www-data /var/www/.config /var/www/.cache
+            sudo chmod -R 755 /var/www/.config
+            sudo chmod -R 775 /var/www/.cache
+            
+            # Install dependencies and run Laravel commands
+            cd "${CURRENT_LINK}"
+            sudo -u www-data COMPOSER_CACHE_DIR=/var/www/.cache/composer composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
+            
+            # Clear Laravel caches
+            sudo -u www-data php artisan config:clear
+            sudo -u www-data php artisan cache:clear
+            sudo -u www-data php artisan view:clear
+            sudo -u www-data php artisan route:clear
+            sudo -u www-data php artisan optimize:clear
+            
+            # Run migrations and setup
+            sudo -u www-data php artisan migrate --force     
+            sudo -u www-data php artisan key:generate --force
+            sudo -u www-data php artisan queue:restart
+            sudo -u www-data php artisan storage:link
+            
+            # Setup log permissions
+            sudo touch "${CURRENT_LINK}/storage/logs/laravel.log"
+            sudo chown www-data:www-data "${CURRENT_LINK}/storage/logs/laravel.log"
+            sudo chmod 664 "${CURRENT_LINK}/storage/logs/laravel.log"
+
+            # Set permissions for storage directory
+            sudo chmod -R 777 "${DEPLOY_DIR}/storage/"
+            
+            # Install ACL and set up directory permissions
+            sudo apt update
+            # sudo apt install -y acl
+            
+            # Apply ACLs for www-data user
+            sudo chown -R www-data:www-data /var/www/backend/current/storage
+            sudo find /var/www/backend/current/storage -type d -exec chmod 777 {} \;
+            sudo find /var/www/backend/current/storage -type f -exec chmod 777 {} \;
+            sudo find /var/www/backend/current/storage -type d -exec chmod g+s {} \;
+            sudo setfacl -R -m d:u:www-data:rwx /var/www/backend/current/storage
+            sudo setfacl -R -m u:www-data:rwx /var/www/backend/current/storage
+
+      # Configure worker processes using the supervisor configuration
+
+      - name: Configure Worker Processes
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            CURRENT_LINK="/var/www/backend/current"
+            
+            # Copy supervisor configuration
+            # echo "Copying supervisor configuration..."
+            # sudo cp ${CURRENT_LINK}/deploy/supervisor/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
+            # sudo chown root:root /etc/supervisor/conf.d/laravel-worker.conf
+            # sudo chmod 644 /etc/supervisor/conf.d/laravel-worker.conf
+            
+            # Update and restart supervisor
+            echo "=== KILLING ALL EXISTING WORKERS ==="
+            sudo supervisorctl stop all
+            #sudo pkill -f "artisan queue:work" || true
+            #sudo pkill -f "artisan queue:work" --signal SIGKILL || true
+            ps aux | grep "artisan queue:work" | grep -v ssh | grep -v grep | awk '{print $2}' | xargs -r sudo kill -9
+            
+            echo "=== CLEARING STUCK DATABASE JOBS ==="
+            cd ${CURRENT_LINK}
+            sudo -u www-data php artisan tinker --execute="DB::table('jobs')->whereNotNull('reserved_at')->update(['reserved_at' => null, 'attempts' => 0]); echo 'Cleared stuck jobs';" || true
+            
+            echo "=== RESTARTING ALL WORKERS ==="
+            sudo supervisorctl reread
+            sudo supervisorctl update
+            # sudo supervisorctl start laravel-parlley-worker:*
+            # sudo supervisorctl start laravel-worker:*
+            # sudo supervisorctl start laravel-finalize-worker:*
+            # sudo supervisorctl start laravel-execute-worker:*
+            # sudo supervisorctl start laravel-onetimepayment-worker:*
+            # sudo supervisorctl start laravel-everee-worker:*
+            # sudo supervisorctl start laravel-onetimewebhook-worker:*
+            # sudo supervisorctl start laravel-quickbooks-worker:*
+            # sudo supervisorctl start laravel-recalculate-open-sales:*
+            # sudo supervisorctl start laravel-sales-import:*
+            # sudo supervisorctl start laravel-RDS_Fox_Sales:*
+            # sudo supervisorctl start laravel-KinWebHookSaleProcess:*
+            # sudo supervisorctl start laravel-employment-package:*
+            # sudo supervisorctl start laravel-Clark-Import:*
+            # sudo supervisorctl start laravel-HomeTeam-Import:*
+            sudo service supervisor reload
+            
+            echo "✅ All workers restarted successfully!"
+
+      # Upload database monitoring script
+      - name: Upload Database Monitoring Script
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./db_monitoring_script.sh"
+          target: "/tmp"
+          
+      # Execute Database Monitoring Script
+      - name: Execute Database Monitoring
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Create scripts directory and move script there
+            sudo mkdir -p /var/www/backend/current/scripts
+            sudo mv /tmp/db_monitoring_script.sh /var/www/backend/current/scripts/
+            sudo chmod +x /var/www/backend/current/scripts/db_monitoring_script.sh
+            
+            # Execute monitoring script
+            sudo bash /var/www/backend/current/scripts/db_monitoring_script.sh
+            
+            # Final deployment summary
+            echo ""
+            echo "==============================================="
+            echo "🚀 DEPLOYMENT COMPLETED SUCCESSFULLY"
+            echo "==============================================="
+            echo "Server: ${{ matrix.name }}"
+            echo "Host: ${{ matrix.host }}"
+            echo "Deploy Directory: /var/www/backend/${{ github.run_number }}"
+            echo "==============================================="

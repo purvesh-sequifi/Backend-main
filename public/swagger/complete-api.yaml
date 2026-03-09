@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: Sequifi API Documentation
+  description: |-
+    Comprehensive API documentation for Sequifi backend services.
+    
+    _Authentication: Provide your API key in the request header `api-key` or in the request body._
+  contact:
+    email: gary@sequifi.in
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Sequifi
+  url: https://sequifi.com
+servers:
+  - url: /public/api
+  - url: /api
+tags:
+  - name: Authentication
+    description: User authentication endpoints
+  - name: User Management
+    description: User creation and management
+  - name: Sales
+    description: Sales-related operations
+  - name: Hiring
+    description: Employee hiring and management
+  - name: Billing
+    description: Subscription and billing management
+  - name: Reports
+    description: Reporting and analytics
+  - name: Documents
+    description: Document management
+  - name: Settings
+    description: Application settings
+
+components:
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    sanctum:
+      type: http
+      scheme: bearer
+
+paths:
+  # Authentication Endpoints
+  /login:
+    post:
+      tags:
+        - Authentication
+      security: []
+      summary: User login
+      description: Authenticate a user and get access token
+      operationId: userLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: secret123
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Login successful
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: "1|abcdefghijklmnopqrstuvwxyz1234567890"
+                      user:
+                        type: object
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Invalid credentials
+                  
+  /logout:
+    post:
+      tags:
+        - Authentication
+      security:
+        - sanctum: []
+      summary: User logout
+      description: Invalidate the user's access token
+      operationId: userLogout
+      responses:
+        '200':
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully logged out
+                    
+  /forgot-password:
+    post:
+      tags:
+        - Authentication
+      security: []
+      summary: Forgot password
+      description: Send password reset link to user's email
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+      responses:
+        '200':
+          description: Password reset link sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Password reset link sent to your email
+
+  # Sales API Endpoints
+  /create-sale:
+    post:
+      tags:
+        - Sales
+      security:
+        - api-key: []
+      summary: Create or update sale
+      description: Create or update a sale record
+      operationId: createSale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                api-key:
+                  type: string
+                  description: API secret key
+                # Additional sale properties would be defined here
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized operation
+        '422':
+          description: Validation exception
+          
+  # Hiring API Endpoints
+  /departments-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: []
+      summary: Department list
+      description: Get a list of all departments
+      operationId: departmentsList
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized operation
+
+  /recruiter-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: []
+      summary: Recruiter list
+      description: Get a list of all recruiters
+      operationId: recruiterList
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized operation
+          
+  /positions-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: []
+      summary: Positions list
+      description: Get a list of all positions
+      operationId: positionsList
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized operation
+          
+  /manager-list:
+    get:
+      tags:
+        - Hiring
+      security:
+        - api-key: []
+      summary: Manager list
+      description: Get a list of all managers
+      operationId: managerList
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized operation
+          
+  /create-employee:
+    post:
+      tags:
+        - Hiring
+      security:
+        - api-key: []
+      summary: Create employee
+      description: Create a new employee
+      operationId: createEmployee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - first_name
+                - last_name
+              properties:
+                api-key:
+                  type: string
+                  description: API secret key
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                # Additional employee properties would be defined here
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized operation
+        '422':
+          description: Validation exception

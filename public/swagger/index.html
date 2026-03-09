@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Sequifi API Documentation</title>
+        <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
+        <style>
+            html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+            *, *:before, *:after { box-sizing: inherit; }
+            body { margin: 0; background: #fafafa; }
+            
+            /* Custom styles for better tag visibility */
+            .swagger-ui .opblock-tag { 
+                font-size: 16px !important; 
+                padding: 10px !important;
+                margin: 15px 0 5px 0 !important;
+            }
+            .swagger-ui .opblock-tag-section { margin-bottom: 10px; }
+            
+            /* Highlight external APIs */
+            .swagger-ui .opblock-tag[data-tag^="External"] {
+                background-color: #f0f8ff !important;
+                border-left: 4px solid #1976D2 !important;
+            }
+            
+            /* Add helper text at the top */
+            .api-helper {
+                background: #fff;
+                padding: 15px;
+                border-radius: 4px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+                margin: 15px;
+            }
+            .api-helper h3 {
+                margin-top: 0;
+                color: #3b4151;
+            }
+            .api-helper ul {
+                padding-left: 20px;
+            }
+            .api-helper li {
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="api-helper">
+            <h3>Sequifi API Documentation</h3>
+            <p>This documentation includes all API endpoints, including Turn.ai and other external integrations.</p>
+            <p><strong>Finding Turn.ai APIs:</strong></p>
+            <ul>
+                <li>Use the filter box at the top right to search for "turn" or "s_clearance_turn"</li>
+                <li>Or look for the tag section <strong>External: SClearance</strong> which includes all Turn.ai endpoints</li>
+                <li>External APIs are highlighted with blue background for easy identification</li>
+            </ul>
+        </div>
+        
+        <div id="swagger-ui"></div>
+
+        <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+        <script>
+            window.onload = function() {
+                // Force clear any cached content
+                localStorage.removeItem('swagger-ui-cache');
+                
+                const ui = SwaggerUIBundle({
+                    url: "../swagger-json/api-docs-segregated.json",
+                    dom_id: '#swagger-ui',
+                    defaultModelsExpandDepth: -1,  // Hide schemas section by default
+                    displayRequestDuration: true,
+                    docExpansion: 'none',          // Collapse all sections by default
+                    filter: true,                  // Enable filter
+                    showExtensions: true,
+                    deepLinking: true,             // Enable direct links to operations
+                    tagsSorter: 'alpha',           // Sort tags alphabetically
+                    tryItOutEnabled: false,        // Disable try it out by default
+                });
+                
+                // Store UI reference for browser console access
+                window.ui = ui;
+                
+                // Add event listener to the search box
+                setTimeout(function() {
+                    var searchBox = document.querySelector('.swagger-ui .topbar-wrapper .download-url-input');
+                    if (searchBox) {
+                        searchBox.setAttribute('placeholder', 'Search for Turn.ai, SClearance, etc.');
+                    }
+                }, 1000);
+            };
+        </script>
+    </body>
+</html>

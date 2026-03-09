@@ -1,0 +1,61 @@
+name: ui.sequifi.com
+
+on:
+  push:
+    branches:
+      - ui-backend
+
+env:
+  DEPLOY_USER: "ubuntu"
+  DEPLOY_PATH: "/var/www/backend"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Allow all deployments to complete even if one fails
+      matrix:
+        include:
+
+          - name: ui.sequifi.com
+            host: "54.177.72.120"
+            ssm_param: "/backend/ui"
+            concurrency_group: "ui-deployment"           
+
+    concurrency:
+      group: ${{ matrix.concurrency_group }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to ${{ matrix.name }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SEQUIFI_PROD_KEY }}
+          script: |
+            set -e
+
+            DEPLOY_PATH="/var/www/backend"
+            DEPLOY_DIR="${DEPLOY_PATH}/${{ github.run_number }}"
+            SSM_PARAM="${{ matrix.ssm_param }}"
+
+            echo "Starting Deployment #${{ github.run_number }} to ${{ matrix.name }}"
+            echo "Using SSM Parameter: $SSM_PARAM"
+
+            sudo rm -rf "${DEPLOY_DIR}" 2>/dev/null || true
+            sudo mkdir -p "${DEPLOY_DIR}"
+
+            sudo git clone --branch="${{ github.ref_name }}" \
+              "https://x-token-auth:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+              "${DEPLOY_DIR}"
+
+            sudo chown -R www-data:www-data "${DEPLOY_DIR}"
+            sudo chmod +x "${DEPLOY_DIR}/scripts/deploy.sh"
+
+            cd "${DEPLOY_DIR}"
+            
+            sudo bash scripts/deploy.sh "${{ github.run_number }}" "${{ github.ref_name }}" "${{ github.sha }}" "$SSM_PARAM"

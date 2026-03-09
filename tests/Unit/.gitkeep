@@ -1,0 +1,6 @@
+<?php
+
+// Placeholder test file to prevent test directory errors
+// This file ensures PHPUnit can find the test directories
+
+

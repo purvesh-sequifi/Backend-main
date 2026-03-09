@@ -1,0 +1,117 @@
+<?php
+
+return [
+    // Assets
+    'assets' => [
+        'favicon' => 'media/logos/favicon.ico',
+        'fonts' => [
+            'google' => [
+                'Roboto:300,400,500,600,700',
+            ],
+        ],
+        'css' => [
+            'plugins/global/plugins.bundle.css',
+            'plugins/global/plugins-custom.bundle.css',
+            'css/style.bundle.css',
+        ],
+        'js' => [
+            'plugins/global/plugins.bundle.js',
+            'js/scripts.bundle.js',
+            'js/custom/widgets.js',
+            'js/init.js',
+        ],
+    ],
+
+    // Layout
+    'layout' => [
+        // Main
+        'main' => [
+            'type' => 'default', // Set layout type: default|blank|none
+            'primary-color' => '#04C8C8', // Primary color used in email templates
+            'page-bg-white' => false, // Set true if page background color is white
+        ],
+
+        // Docs
+        'docs' => [
+            'logo-path' => [
+                'default' => 'logos/logo-1.svg',
+                'dark' => 'logos/logo-1-dark.svg',
+            ],
+            'logo-path-mobile' => 'logos/logo-2.svg',
+            'logo-class' => 'h-25px',
+            'logo-class-mobile' => 'h-35px',
+        ],
+
+        // Illustration
+        'illustrations' => [
+            'set' => 'sigma-1',
+        ],
+
+        // Loader
+        'loader' => [
+            'display' => false,
+            'type' => 'default', // Set default|spinner-message|spinner-logo to hide or show page loader
+        ],
+
+        // Scrolltop
+        'scrolltop' => [
+            'display' => true, // Enable scrolltop
+        ],
+
+        // Header
+        'header' => [
+            'display' => true, // Set true|false to show or hide Header
+            'width' => 'fixed', // Set fixed|fluid to change width type
+            'fixed' => [
+                'desktop' => true,  // Set true|false to set fixed Header for desktop mode
+                'tablet-and-mobile' => true, // Set true|false to set fixed Header for tablet and mobile modes
+            ],
+        ],
+
+        // Page title
+        'page-title' => [
+            'display' => true, // Display page title
+            'breadcrumb' => true, // Display breadcrumb
+            'description' => false, // Display description
+            'responsive' => true, // Move page title to cotnent on mobile mode
+            'responsive-breakpoint' => 'lg', // Responsive breakpoint value(e.g: md, lg, or 300px)
+            'responsive-target' => '#kt_toolbar_container', // Responsive target selector
+        ],
+
+        // Aside
+        'aside' => [
+            'menu' => 'main', // Set main|documentation menu for Aside
+            'fixed' => true,  // Set true|false to enabled or disable Fixed Aside mode
+            'secondary-display' => true, // Set true|false to show or hide Aside Secondary
+            'minimized' => false, // Set aside default minimized
+            'minimize' => true, // Enable aside minimization,
+            'menu-icon' => 'svg', // Menu icon type(svg|font)
+        ],
+
+        // Content
+        'content' => [
+            'width' => 'fixed', // Set fixed|fluid to change width type
+            'layout' => 'default',  // Set content type
+        ],
+
+        // Footer
+        'footer' => [
+            'width' => 'fixed', // Set fixed|fluid to change width type
+        ],
+
+        // Scrolltop
+        'scrolltop' => [
+            'display' => true, // Display scrolltop
+        ],
+
+        // Engage
+        'engage' => [
+            'demos' => [
+                'enabled' => true,
+            ],
+            'purchase' => [
+                'enabled' => true,
+            ],
+        ],
+    ],
+];

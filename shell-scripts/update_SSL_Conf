@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# S3 bucket and path
+S3_BUCKET="s3://sequifi/aditya/SSL_Certs"
+
+# Create a temporary directory
+TEMP_DIR=$(mktemp -d)
+echo "Using temporary directory: $TEMP_DIR"
+
+# Download the certificate files from S3
+aws s3 cp "$S3_BUCKET/sequifi_com_chain.crt" "$TEMP_DIR/sequifi_com_chain.crt"
+aws s3 cp "$S3_BUCKET/STAR_sequifi_com.crt" "$TEMP_DIR/STAR_sequifi_com.crt"
+
+# Check if files were downloaded successfully
+if [ ! -f "$TEMP_DIR/sequifi_com_chain.crt" ] || [ ! -f "$TEMP_DIR/STAR_sequifi_com.crt" ]; then
+    echo "Error: One or more files failed to download from S3"
+    exit 1
+fi
+
+# Backup existing certificates if they exist
+sudo cp /etc/ssl/certs/STAR_sequifi_com.crt /etc/ssl/certs/STAR_sequifi_com.crt.backup 2>/dev/null
+sudo cp /etc/ssl/certs/sequifi_com_chain.crt /etc/ssl/certs/sequifi_com_chain.crt.backup 2>/dev/null
+
+# Copy new certificates to their locations
+sudo cp "$TEMP_DIR/STAR_sequifi_com.crt" /etc/ssl/certs/
+sudo cp "$TEMP_DIR/sequifi_com_chain.crt" /etc/ssl/certs/
+
+# Set proper permissions
+sudo chmod 644 /etc/ssl/certs/STAR_sequifi_com.crt
+sudo chmod 644 /etc/ssl/certs/sequifi_com_chain.crt
+
+# Clean up
+rm -rf "$TEMP_DIR"
+
+echo "SSL certificates have been updated successfully."

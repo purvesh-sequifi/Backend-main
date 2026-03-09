@@ -1,0 +1,59 @@
+# ============================================================================
+# Sequifi PDF Processing Requirements
+# ============================================================================
+# Date: November 30, 2025
+# Python Version: 3.10+
+#
+# Installation:
+#   pip install -r requirements.txt
+#
+# Or with upgrade:
+#   pip install --upgrade -r requirements.txt
+# ============================================================================
+
+# PDF Manipulation and Rendering
+# PyMuPDF - Fast PDF processing with text extraction and rendering
+# Required by: txtLocator.py, eSignWithTs.py, convert_pdf_to_images.py, resizePdf.py, sequidocs-alter-pdf-data.py
+PyMuPDF==1.24.13
+
+# Image Processing
+# Pillow - Python Imaging Library for image manipulation
+# Required by: eSignWithTs.py, convert_pdf_to_images.py, merge_data_into_image.py, convert_images_to_pdf.py
+Pillow==11.0.0
+
+# PDF Generation
+# ReportLab - PDF generation from images and graphics
+# Required by: convert_images_to_pdf.py
+reportlab==4.2.5
+
+# HTTP Client
+# Requests - HTTP library for downloading PDFs
+# Required by: txtLocator.py, eSignWithTs.py
+requests==2.32.3
+
+# ============================================================================
+# Version Notes
+# ============================================================================
+#
+# PyMuPDF 1.24.13 (Dec 2024):
+#   - Improved text extraction performance
+#   - Enhanced image handling
+#   - Better memory management
+#   - No breaking changes for existing code
+#
+# Pillow 11.0.0 (Oct 2024):
+#   - Security fixes
+#   - Performance improvements
+#   - Better WebP support
+#   - No breaking changes for existing code
+#
+# ReportLab 4.2.5 (Nov 2024):
+#   - Bug fixes
+#   - Performance improvements
+#   - No breaking changes for existing code
+#
+# Requests 2.32.3 (Jun 2024):
+#   - Security patches
+#   - No breaking changes for existing code
+#
+# ============================================================================

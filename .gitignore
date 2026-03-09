@@ -1,0 +1,141 @@
+/node_modules
+
+# Documentation (internal developer docs - not for production)
+# But allow docs/images for README screenshots
+/docs/*
+!/docs/images/
+
+/public/hot
+# /public/storage
+# /public/css
+# /public/js
+# /public/media
+# /public/plugins
+
+# /public/demo1
+/public/demo2
+/public/demo3
+/public/demo4
+/public/demo5
+/public/demo6
+/public/demo7
+/public/demo8
+/public/demo9
+/public/demo10
+/public/demo11
+/public/demo12
+/public/demo13
+/public/document
+/public/company-image
+
+# /storage/*.key
+/vendor
+.env
+.env.prod
+.env.staging
+.env.backup
+/.phpunit.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+composer.lock
+yarn.lock
+# package-lock.json
+/public/template
+
+public/mix-manifest.json
+note.txt
+
+/.idea
+
+.DS_Store
+Dockerfile
+/DocSigningGateway
+/DocSigningGateway-v1.1.0
+/public/adminer.php
+# API Performance Monitoring
+storage/api_metrics.sqlite
+storage/*_api_metrics.sqlite
+storage/*_database.sqlite
+# .cursor - DO NOT commit mcp.json (contains API keys!)
+.cursor/mcp.json
+.cursor/README.md
+.cursor/load-mcp-env.sh
+
+# MCP environment variables (local secrets and templates)
+.env.mcp.local
+.env.mcp.example
+
+# Taskmaster (project planning tool - local development only)
+.taskmaster/
+
+# Cursor IDE rules (local development only)
+.cursor/rules/
+
+# Taskmaster auto-generated command documentation (not needed in repo)
+.cursor/commands/
+
+# MCP Servers
+~/*
+
+# Laravel Boost (local AI development tools)
+# Track .cursor/mcp.json in git for persistent MCP setup across deployments
+.cursor/rules/laravel-boost.mdc
+.mcp.json
+.vscode/mcp.json
+boost.json
+CLAUDE.md
+rr
+.rr.yaml
+.env.tmp
+*.tmp
+
+# ClickHouse credentials and operational scripts
+*clickhouse*credentials*
+*ssm-parameters*.sh
+*ssm-parameters*.py
+remaining-parameters.txt
+EXAMPLE_UPDATED_PARAMETER.txt
+
+# Temporary audit/review documents (do not push .md to PR)
+*UPDATE*SUMMARY*.md
+*FINAL*REPORT*.md
+*INTERNAL*REVIEW*.md
+*AUDIT*COMPLETE*.md
+.pr-*.md
+RCA-*.md
+
+# PHPUnit cache
+.phpunit.result.cache
+
+# Local PHP configuration (do not commit)
+public/.user.ini
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 

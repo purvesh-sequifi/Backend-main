@@ -1,0 +1,54 @@
+name: Multitenant Deployment
+
+on:
+  push:
+    branches:
+      - multitenant_yev
+
+env:
+  DEPLOY_HOST: "54.151.68.36"
+  DEPLOY_USER: "ubuntu"
+  DEPLOY_PATH: "/var/www/backend"
+  SSM_PARAM: "/backend/multitenant"
+
+concurrency:
+  group: multitenant-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to multitenant.sequifi.com
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.SEQUIFI_PROD_KEY }}
+          script: |
+            set -e
+
+            DEPLOY_PATH="/var/www/backend"
+            DEPLOY_DIR="${DEPLOY_PATH}/${{ github.run_number }}"
+            SSM_PARAM="${{ env.SSM_PARAM }}"
+
+            echo "Starting Deployment #${{ github.run_number }} to multitenant.sequifi.com"
+            echo "Branch: ${{ github.ref_name }}"
+            echo "Using SSM Parameter: $SSM_PARAM"
+
+            sudo rm -rf "${DEPLOY_DIR}" 2>/dev/null || true
+            sudo mkdir -p "${DEPLOY_DIR}"
+
+            sudo git clone --branch="${{ github.ref_name }}" \
+              "https://x-token-auth:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+              "${DEPLOY_DIR}"
+
+            sudo chown -R www-data:www-data "${DEPLOY_DIR}"
+            sudo chmod +x "${DEPLOY_DIR}/scripts/deploy.sh"
+
+            cd "${DEPLOY_DIR}"
+            
+            sudo bash scripts/deploy.sh "${{ github.run_number }}" "${{ github.ref_name }}" "${{ github.sha }}" "$SSM_PARAM"

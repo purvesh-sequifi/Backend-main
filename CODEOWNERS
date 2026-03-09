@@ -1,0 +1,207 @@
+# CODEOWNERS file for GitLab
+# This file defines who should be notified and required to review changes
+# Each line is a file pattern followed by one or more owners
+# Owners can be users (@username) or groups (@group-name)
+
+# =============================================================================
+# CODEOWNERS - CRITICAL SECURITY
+# This file controls ALL security permissions - MUST be protected
+# Only senior DevOps can modify access control
+# =============================================================================
+CODEOWNERS @gorakhoo7 @garydalal
+
+# =============================================================================
+# GITIGNORE - CRITICAL SECURITY
+# Controls what gets deployed to production - only senior DevOps can modify
+# =============================================================================
+.gitignore @gorakhoo7 @garydalal
+
+# =============================================================================
+# GITHUB WORKFLOWS - CRITICAL INFRASTRUCTURE
+# All workflow file changes require senior DevOps approval only
+# =============================================================================
+.github/workflows/ @gorakhoo7 @garydalal
+.github/workflows/*.yml @gorakhoo7 @garydalal
+
+# =============================================================================
+# DEPLOYMENT SCRIPTS - CRITICAL INFRASTRUCTURE
+# All deployment script changes require DevOps team approval
+# =============================================================================
+scripts/deploy.sh @gorakhoo7 @garydalal
+scripts/deploy-*.sh @gorakhoo7 @garydalal
+
+# =============================================================================
+# SCHEDULER KERNEL - CRITICAL INFRASTRUCTURE
+# Controls all scheduled tasks, cron jobs, and background processes
+# Changes require careful review to prevent production issues
+# =============================================================================
+app/Console/Kernel.php @gorakhoo7 @garydalal
+
+# =============================================================================
+# CRITICAL COMMISSION & OVERRIDE CALCULATION FILES
+# These files contain core business logic for commission and override calculations
+# ALL changes require multiple developer approvals
+# =============================================================================
+
+# Core Commission Calculation Traits (CRITICAL)
+app/Core/Traits/SaleTraits/SubroutineTrait.php @gorakhoo7 @garydalal
+app/Core/Traits/SaleTraits/SubroutineProjectionTrait.php @gorakhoo7 @garydalal
+app/Core/Traits/SaleTraits/SubroutineOverrideTrait.php @gorakhoo7 @garydalal
+app/Core/Traits/OverrideCommissionTrait.php @gorakhoo7 @garydalal
+app/Core/Traits/OverrideStackTrait.php @gorakhoo7 @garydalal
+app/Core/Traits/SaleTraits/OverrideStackTrait.php @gorakhoo7 @garydalal
+
+# Main Sales Controllers (CRITICAL)
+app/Http/Controllers/API/V2/Sales/SalesController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/Sales/SalesProcessController.php @gorakhoo7 @garydalal
+
+# Sales Processing Jobs (CRITICAL)
+app/Jobs/Sales/SaleProcessJob.php @gorakhoo7 @garydalal
+
+# Core Models for Commission/Override Data (CRITICAL)
+app/Models/UserCommission.php @gorakhoo7 @garydalal
+app/Models/UserOverrides.php @gorakhoo7 @garydalal
+app/Models/ClawbackSettlement.php @gorakhoo7 @garydalal
+app/Models/SaleMasterProcess.php @gorakhoo7 @garydalal
+
+# Commission History & Lock Models (CRITICAL)
+app/Models/UserCommissionHistory.php @gorakhoo7 @garydalal
+app/Models/UserCommissionLock.php @gorakhoo7 @garydalal
+app/Models/UserOverridesLock.php @gorakhoo7 @garydalal
+app/Models/ClawbackSettlementLock.php @gorakhoo7 @garydalal
+
+# Projection Models (CRITICAL)
+app/Models/ProjectionUserCommission.php @gorakhoo7 @garydalal
+app/Models/ProjectionUserOverrides.php @gorakhoo7 @garydalal
+
+# Override Calculation Commands (CRITICAL)
+app/Console/Commands/CalculateOverrideProjections.php @gorakhoo7 @garydalal
+app/Console/Commands/CalculateUserOverrideProjections.php @gorakhoo7 @garydalal
+
+# =============================================================================
+# PAYROLL SYSTEM FILES (CRITICAL)
+# Refactored payroll system controllers and core payroll logic
+# =============================================================================
+
+# Main Payroll Controller (CRITICAL)
+app/Http/Controllers/API/Payroll/PayrollSingleController.php @gorakhoo7 @garydalal
+
+# Refactored Payroll Controllers (CRITICAL)
+app/Http/Controllers/API/Payroll/PayrollComponentController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/Payroll/PayrollAdjustmentController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/Payroll/PayrollDataController.php @gorakhoo7 @garydalal
+
+# Payroll Models (CRITICAL)
+app/Models/Payroll.php @gorakhoo7 @garydalal
+
+# =============================================================================
+# OTHER IMPORTANT FILES
+# =============================================================================
+
+# Database migrations affecting commission/payroll tables
+database/migrations/*commission*.php @gorakhoo7 @garydalal
+database/migrations/*override*.php @gorakhoo7 @garydalal
+database/migrations/*payroll*.php @gorakhoo7 @garydalal
+database/migrations/*clawback*.php @gorakhoo7 @garydalal
+
+# =============================================================================
+# DATABASE SCHEMA DUMP - CRITICAL PROTECTION
+# This file contains the consolidated production database schema (410 tables)
+# Replacing 1,014 migrations - MUST be protected from accidental changes
+# =============================================================================
+
+# Schema dump file (CRITICAL - DO NOT MODIFY)
+database/schema/mysql-schema.sql @gorakhoo7 @garydalal
+
+# =============================================================================
+# SEQUIDOCS SYSTEM FILES (V2 & LEGACY)
+# All SequiDocs related files and functionality - comprehensive coverage
+# =============================================================================
+
+# SequiDocs V2 Controllers (COMPLETE SET - 11 controllers)
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsCategoryV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsDropdownV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsStandardV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsTemplateV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsAdditionalAPIController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsDocumentTypeV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsSentTemplateV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsTemplateTestV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsUserDocumentsV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsDigitalSignatureController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/SequiDocsExternalRecipientV2Controller.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/SequiDocs/BaseController.php @gorakhoo7 @garydalal
+
+# Legacy SequiDocs Models
+app/Models/SequiDocsTemplate.php @gorakhoo7 @garydalal
+app/Models/SequiDocsSignature.php @gorakhoo7 @garydalal
+app/Models/SequiDocsEmailSettings.php @gorakhoo7 @garydalal
+app/Models/SequiDocsDocumentComment.php @gorakhoo7 @garydalal
+app/Models/SequiDocsTemplateCategories.php @gorakhoo7 @garydalal
+app/Models/SequiDocsTemplatePermissions.php @gorakhoo7 @garydalal
+app/Models/SequiDocsSendAgreementWithTemplate.php @gorakhoo7 @garydalal
+
+# NewSequiDocs Models (V2 Models - COMPLETE SET)
+app/Models/NewSequiDocsDocument.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsTemplate.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsDocumentComment.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsTemplatePermission.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsUploadDocumentType.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsUploadDocumentFile.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsSignatureRequestLog.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsSendDocumentWithOfferLetter.php @gorakhoo7 @garydalal
+app/Models/NewSequiDocsSendSmartTempplateWithOfferLetter.php @gorakhoo7 @garydalal
+
+# SequiDocs Helper & Services
+app/SequiDocsHelper.php @gorakhoo7 @garydalal
+
+# SequiDocs Jobs (V2)
+app/Jobs/SequiDocs/UserDocumentSentV2Job.php @gorakhoo7 @garydalal
+app/Jobs/SequiDocs/SentOfferLetterV2Job.php @gorakhoo7 @garydalal
+app/Jobs/AddUpdateNewSequiDocsDocumentOnBigQueryJob.php @gorakhoo7 @garydalal
+app/Jobs/SequiDocs/ @gorakhoo7 @garydalal
+
+# SequiDocs Console Commands
+app/Console/Commands/SyncNewSequiDocsDocumentOnBigQueryHourly.php @gorakhoo7 @garydalal
+
+# SequiDocs Routes (V2)
+routes/sequifi/v2/sequidocs/ @gorakhoo7 @garydalal
+routes/sequifi/v2/sequidocs/auth.php @gorakhoo7 @garydalal
+
+# SequiDocs Seeders
+database/seeders/SequiDocsEmailSettingSeeder.php @gorakhoo7 @garydalal
+
+# SequiDocs Database Migrations (comprehensive patterns)
+database/migrations/*sequidocs*.php @gorakhoo7 @garydalal
+database/migrations/*sequi_docs*.php @gorakhoo7 @garydalal
+database/migrations/*new_sequi_docs*.php @gorakhoo7 @garydalal
+
+# SequiDocs Python Scripts
+py-scripts/sequidocs-alter-pdf-data.py @gorakhoo7 @garydalal
+
+# Legacy SequiDocs Controller
+app/Http/Controllers/API/SequiDocsTemplateContoller.php @gorakhoo7 @garydalal
+
+# Files that import/use SequiDocs (controllers that integrate with SequiDocs)
+app/Http/Controllers/API/Hiring/OnboardingEmployeeBVController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/Hiring/LeadsController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/Hiring/EmployeeProfileController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/Hiring/OnboardingEmployeeController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/Hiring/OnboardingEmployeeController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/Position/PositionController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/Tiers/TiersPositionController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/V2/Useremploymentpackage/HiredUserController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/Setting/PositionCommissionController.php @gorakhoo7 @garydalal
+app/Http/Controllers/API/EmailConfigurationController.php @gorakhoo7 @garydalal
+
+# Jobs that use SequiDocs models
+app/Jobs/finalizeW2PayrollJob.php @gorakhoo7 @garydalal
+app/Jobs/finalizePayrollJob.php @gorakhoo7 @garydalal
+
+# =============================================================================
+# CONFIGURATION FILES
+# =============================================================================
+
+# Configuration files (security sensitive)
+config/ @gorakhoo7
+.env.example @gorakhoo7

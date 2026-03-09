@@ -1,0 +1,41 @@
+name: Railway Preview - Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - railway_POC_8_2
+
+env:
+  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+      
+      - name: Delete Services
+        run: |
+          PR_NUM=${{ github.event.number }}
+          
+          echo "🗑️ Cleaning up PR #$PR_NUM..."
+          
+          # Project token is already scoped - no link needed
+          railway service delete pr-${PR_NUM}-backend --yes || echo "Backend not found"
+          railway service delete pr-${PR_NUM}-frontend --yes || echo "Frontend not found"
+          
+          echo "✅ Cleanup complete"
+      
+      - name: Post Comment
+        run: |
+          PR_NUM=${{ github.event.number }}
+          COMMENT="## 🧹 Preview Cleaned Up
+          
+          Services pr-${PR_NUM}-backend and pr-${PR_NUM}-frontend deleted."
+          
+          gh pr comment $PR_NUM --body "$COMMENT"
+        env:
+          GH_TOKEN: ${{ github.token }}

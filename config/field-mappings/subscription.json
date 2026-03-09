@@ -1,0 +1,293 @@
+{
+    "field_mappings": {
+        "api_to_db": {
+            "subscriptionID": {
+                "db_field": "pid",
+                "type": "integer",
+                "required": true
+            },
+            "customerID": {
+              "db_fields": [
+                "customer_id",
+                "homeowner_id"
+              ],
+                "type": "integer",
+                "required": true
+            },
+            "soldBy": {
+                "db_fields": [
+                    "soldBy",
+                    "sales_rep_email",
+                    "closer1_id",
+                    "sales_rep_name",
+                    "sales_setter_name"
+                ],
+                "type": "string",
+                "required": false,
+                "transform": "sales_rep_transform",
+                "allow_null_transform": true,
+                "default": {
+                    "soldBy": null,
+                    "sales_rep_email": null,
+                    "closer1_id": null,
+                    "sales_rep_name": null,
+                    "sales_setter_name": null
+                }
+            },
+            "soldBy2": {
+                "db_field": "closer2_id",
+                "type": "integer",
+                "required": false
+            },
+            "dateAdded": {
+                "db_fields": [
+                    "customer_signoff",
+                    "created_at"
+                ],
+                "type": "datetime",
+                "required": true,
+                "transform": "date_transform"
+            },
+            "contractValue": {
+                "db_field": "gross_account_value",
+                "type": "decimal",
+                "required": true
+            },
+            "serviceType": {
+                "db_fields": [
+                    "product",
+                    "product_id",
+                    "product_code"
+                ],
+                "type": "string",
+                "required": true,
+                "transform": "product_transform"
+            },
+            "agreementLength": {
+                "db_field": "length_of_agreement",
+                "type": "integer",
+                "required": false
+            },
+            "frequency": {
+                "db_field": "service_schedule",
+                "type": "string",
+                "required": false
+            },
+            "initialServiceTotal": {
+                "db_field": "initial_service_cost",
+                "type": "decimal",
+                "required": false
+            },
+            "initialAppointmentID": {
+                "db_field": "initialAppointmentID",
+                "type": "string",
+                "required": false
+            },
+            "recurringCharge": {
+                "db_field": "subscription_payment",
+                "type": "decimal",
+                "required": false
+            },
+            "completedAppointmentIDs": {
+                "db_field": "service_completed",
+                "type": "integer",
+                "required": false,
+                "transform": "completed_appointments_count"
+            },
+            "initialStatusText": {
+                "db_field": "initialStatusText",
+                "type": "string",
+                "required": false
+            },
+            "dateCancelled": {
+                "db_field": "date_cancelled",
+                "type": "datetime",
+                "required": false,
+                "transform": "conditional_cancellation_transform",
+                "allow_null_transform": true
+            }
+        },
+        "customer_api_fields": {
+            "fname": {
+                "db_field": "customer_name",
+                "type": "string",
+                "required": false,
+                "transform": "customer_name_transform",
+                "default": null
+            },
+            "lname": {
+                "db_field": "customer_name",
+                "type": "string",
+                "required": false,
+                "transform": "customer_name_transform",
+                "default": null
+            },
+            "address": {
+                "db_field": "customer_address",
+                "type": "string",
+                "required": false,
+                "default": null
+            },
+            "city": {
+                "db_field": "customer_city",
+                "type": "string",
+                "required": false,
+                "default": null
+            },
+            "state": {
+                "db_field": "customer_state",
+                "type": "string",
+                "required": false,
+                "default": null
+            },
+            "zip": {
+                "db_field": "customer_zip",
+                "type": "string",
+                "required": false,
+                "default": null
+            },
+            "email": {
+                "db_field": "customer_email",
+                "type": "string",
+                "required": false,
+                "default": null
+            },
+            "phone1": {
+                "db_field": "customer_phone",
+                "type": "string",
+                "required": false,
+                "default": null
+            },
+            "mostRecentCreditCardLastFour": {
+                "db_field": "card_on_file",
+                "type": "string",
+                "required": false
+            },
+            "aPay": {
+                "db_field": "auto_pay",
+                "type": "boolean",
+                "required": false
+            },
+            "recurringTicket.balance": {
+                "db_field": "bill_status",
+                "type": "string",
+                "required": false,
+                "transform": "balance_status_transform",
+                "default": null
+            },
+            "balanceAge": {
+                "db_field": "balance_age",
+                "type": "integer",
+                "required": false
+            },
+            "agingDate": {
+                "db_field": "aging_date",
+                "type": "date",
+                "required": false
+            },
+            "responsibleBalance": {
+                "db_field": "responsible_balance",
+                "type": "decimal",
+                "required": false
+            },
+            "responsibleBalanceAge": {
+                "db_field": "responsible_balance_age",
+                "type": "integer",
+                "required": false
+            },
+            "responsibleAgingDate": {
+                "db_field": "responsible_aging_date",
+                "type": "date",
+                "required": false
+            }
+        },
+        "computed_fields": {
+            "job_status": {
+                "type": "string",
+                "required": true,
+                "transform": "compute_job_status"
+            },
+            "m1_date": {
+                "type": "datetime",
+                "required": false,
+                "transform": "compute_m1_date"
+            },
+            "initial_service_date": {
+                "type": "datetime",
+                "required": false,
+                "transform": "compute_initial_service_date"
+            },
+            "import_to_sales": {
+                "type": "integer",
+                "required": true,
+                "transform": "determine_import_to_sales"
+            },
+            "import_status_reason": {
+                "type": "string",
+                "required": false,
+                "transform": "determine_import_status_reason"
+            },
+            "import_status_description": {
+                "type": "text",
+                "required": false,
+                "transform": "determine_import_status_description"
+            }
+        }
+    },
+    "transformers": {
+        "sales_rep_transform": {
+            "description": "Transform sales rep data using User model lookup",
+            "fields": [
+                "sales_rep_email",
+                "closer1_id",
+                "sales_rep_name",
+                "sales_setter_name"
+            ]
+        },
+        "date_transform": {
+            "null_values": [
+                "0000-00-00",
+                "0000-00-00 00:00:00"
+            ],
+            "format": "Y-m-d H:i:s"
+        },
+        "balance_status_transform": {
+            "rules": {
+                "0.00": "cleared",
+                "default": "Pending"
+            }
+        },
+        "completed_appointments_count": {
+            "description": "Count number of completed appointments from comma-separated IDs"
+        },
+        "customer_name_transform": {
+            "description": "Combine first and last name",
+            "fields": ["customer_name"]
+        },
+        "product_transform": {
+            "description": "Transform serviceType into product_id and product_code",
+            "fields": ["product", "product_id", "product_code"]
+        },
+        "conditional_cancellation_transform": {
+            "description": "Apply conditional cancellation logic - only set date_cancelled if last appointment is cancelled",
+            "fields": ["date_cancelled"]
+        },
+        "determine_import_to_sales": {
+            "description": "Determine import_to_sales status based on sales rep validity and date criteria",
+            "fields": ["import_to_sales"]
+        },
+        "determine_import_status_reason": {
+            "description": "Determine import status reason for failed records",
+            "fields": ["import_status_reason"]
+        },
+        "determine_import_status_description": {
+            "description": "Determine import status description for failed records",
+            "fields": ["import_status_description"]
+        }
+    },
+    "metadata": {
+        "version": "1.10",
+        "last_updated": "2025-06-21",
+        "description": "Field mapping configuration between subscription API and database"
+    }
+}

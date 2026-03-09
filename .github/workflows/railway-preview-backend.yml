@@ -1,0 +1,97 @@
+name: Railway Preview - Backend PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - railway_POC_8_2
+
+env:
+  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+      
+      - name: Deploy Backend
+        run: |
+          PR_NUM=${{ github.event.number }}
+          SERVICE_NAME="pr-${PR_NUM}-backend"
+          
+          echo "🚀 Creating/Deploying ${SERVICE_NAME}..."
+          
+          # Fix broken storage symlink (currently points to production path)
+          rm -f public/storage
+          ln -s ../storage/app/public public/storage
+          
+          # Create service if it doesn't exist (ignore error if exists)
+          railway add --service "${SERVICE_NAME}" 2>/dev/null || echo "Service may already exist"
+          
+          # Deploy to the service
+          railway up \
+            --service "${SERVICE_NAME}" \
+            --environment staging
+          
+          # Set environment variables
+          railway variables set \
+            PR_NUMBER=$PR_NUM \
+            GIT_BRANCH=${{ github.head_ref }} \
+            REDIS_PREFIX=pr_${PR_NUM}_ \
+            CACHE_PREFIX=pr_${PR_NUM}_ \
+            SESSION_COOKIE=pr_${PR_NUM}_session \
+            --service "${SERVICE_NAME}" \
+            --environment staging
+          
+          echo "✅ Backend deployed"
+      
+      - name: Deploy Frontend
+        run: |
+          PR_NUM=${{ github.event.number }}
+          SERVICE_NAME="pr-${PR_NUM}-frontend"
+          
+          echo "🚀 Creating/Deploying ${SERVICE_NAME}..."
+          
+          cd ..
+          git clone --depth 1 --branch main https://github.com/sequifi/Frontend.git frontend-deploy
+          cd frontend-deploy
+          
+          # Create service if it doesn't exist (ignore error if exists)
+          railway add --service "${SERVICE_NAME}" 2>/dev/null || echo "Service may already exist"
+          
+          # Deploy to the service
+          railway up \
+            --service "${SERVICE_NAME}" \
+            --environment staging
+          
+          # Set environment variables
+          railway variables set \
+            REACT_APP_API_URL=https://pr-${PR_NUM}-backend.up.railway.app \
+            REACT_APP_BACKEND_FULL_URL=https://pr-${PR_NUM}-backend.up.railway.app/api \
+            PR_NUMBER=$PR_NUM \
+            --service "${SERVICE_NAME}" \
+            --environment staging
+          
+          echo "✅ Frontend deployed"
+      
+      - name: Post Comment
+        run: |
+          PR_NUM=${{ github.event.number }}
+          COMMENT="## 🚀 Preview Deployed
+
+          Frontend: https://pr-${PR_NUM}-frontend.up.railway.app
+          Backend: https://pr-${PR_NUM}-backend.up.railway.app
+          
+          Check Railway dashboard for details."
+          
+          gh pr comment $PR_NUM --body "$COMMENT"
+        env:
+          GH_TOKEN: ${{ github.token }}

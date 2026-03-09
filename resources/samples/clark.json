@@ -1,0 +1,143 @@
+[
+    {
+      "excel_column": "Location",
+      "used_in_system": true,
+      "database_column_name": "pid",
+      "index": 0,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Customer",
+      "used_in_system": true,
+      "database_column_name": "customer_name",
+      "index": 1,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Branch",
+      "used_in_system": true,
+      "database_column_name": "data_source_type",
+      "index": 2,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "SalesPerson",
+      "used_in_system": true,
+      "database_column_name": "sales_rep_name",
+      "index": 3,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "ServiceCode",
+      "used_in_system": true,
+      "database_column_name": ["product", "product_id"],
+      "index": 4,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Source",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 5,
+      "data_type": null
+    },
+    {
+      "excel_column": "Status",
+      "used_in_system": true,
+      "database_column_name": "job_status",
+      "index": 6,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "AddDate",
+      "used_in_system": true,
+      "database_column_name": "customer_signoff",
+      "index": 7,
+      "data_type": "date"
+    },
+    {
+      "excel_column": "WorkDate",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 8,
+      "data_type": null
+    },
+    {
+      "excel_column": "OrigWorkDate",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 9,
+      "data_type": null
+    },
+    {
+      "excel_column": "StartDate",
+      "used_in_system": true,
+      "database_column_name": "trigger_date",
+      "index": 10,
+      "data_type": "json"
+    },
+    {
+      "excel_column": "AnnualWInit",
+      "used_in_system": true,
+      "database_column_name": "gross_account_value",
+      "index": 11,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "CancelDate",
+      "used_in_system": true,
+      "database_column_name": "date_cancelled",
+      "index": 12,
+      "data_type": "date"
+    },
+    {
+      "excel_column": "CCAutoBill",
+      "used_in_system": true,
+      "database_column_name": "auto_pay",
+      "index": 13,
+      "data_type": "string"
+    },
+    {
+      "excel_column": "Total",
+      "used_in_system": true,
+      "database_column_name": "initial_service_cost",
+      "index": 14,
+      "data_type": "float"
+    },
+    {
+      "excel_column": "Completed",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 15,
+      "data_type": null
+    },
+    {
+      "excel_column": "UpgradeDate",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 16,
+      "data_type": null
+    },
+    {
+      "excel_column": "Orig.Monthly",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 17,
+      "data_type": null
+    },
+    {
+      "excel_column": "UpgradeMonthly",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 18,
+      "data_type": null
+    },
+    {
+      "excel_column": "Notes",
+      "used_in_system": false,
+      "database_column_name": null,
+      "index": 19,
+      "data_type": null
+    }
+  ]
+  

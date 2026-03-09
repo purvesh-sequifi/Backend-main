@@ -1,0 +1,35 @@
+# Railway ignore file - exclude large/unnecessary files from deployment
+
+# Demo directories (UI templates - not needed for backend API)
+public/demo1
+public/demo2
+public/demo3
+public/demo4
+public/demo5
+public/demo6
+public/demo7
+public/demo8
+public/demo9
+public/demo10
+public/demo11
+public/demo12
+public/demo13
+
+# Logs (should be empty on fresh deploy)
+storage/logs
+
+# Development files
+*.log
+.env.example
+.git
+.github
+tests
+phpunit.xml
+
+# Python scripts (not needed for Laravel)
+py-scripts
+
+# Documentation
+docs
+*.md
+!README.md
